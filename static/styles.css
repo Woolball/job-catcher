@@ -1,0 +1,58 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+.card {
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #333;
+}
+
+button {
+    position: relative;
+}
+
+.spinner-border {
+    display: none;
+}
+
+#spinner[style*="inline-block"] {
+    display: inline-block;
+}
+
+.list-group-item {
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+}
+
+h5 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+p.mb-1 {
+    margin: 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+small {
+    font-size: 0.875rem;
+    color: #888;
+}
+
+small.text-muted {
+    font-size: 0.75rem;
+    color: #666;
+}

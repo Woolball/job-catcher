@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+
+# private directory
+.private/
+
+# legacy development directory
+.legacy/
+
+# SQLite database files
+*.db
+
+# Uploads directory
+uploads/
