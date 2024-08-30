@@ -4,13 +4,13 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 ## Features
 - **Advanced Matching**: Combines semantic similarity and keyword matching to rank job postings based on relevance to the user's CV.
-- **Search Caching**: Efficient caching using SQLite to store and retrieve job search results, minimizing redundant searches and speeding up the process.
+- **Search Caching**: Efficient caching mechanism using SQLite to store and retrieve job search results, minimizing redundant searches and speeding up the process.
 
 ## Installation
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/Woolball/job-matcher.git
+    git clone https://github.com/yourusername/job-matcher.git
     ```
 
 2. **Navigate to the Project Directory**:
@@ -35,7 +35,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 1. **Run the Flask Application**:
     ```bash
-    python app.py
+    python app/app.py
     ```
 
 2. **Access the Application**:
@@ -45,7 +45,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 You can provide input via either file upload or direct form entry:
 
-- **File Upload**: see examples in the sample_input/ directory
+- **File Upload**:
   - Upload a `.txt` file containing your CV.
   - Upload a `.json` file with the search parameters (see the example below).
 
@@ -80,20 +80,19 @@ After submitting the form or files, the application will display a ranked list o
 ├── static/
 │   ├── styles.css
 ├── data/
-│   └── job_search_cache.db (generated at runtime)
-├── uploads/ (uploaded at runtime)
+│   └── job_search_cache.db (populated at runtime)
 ├── sample_input/
 │   ├── sample_cv.txt
 │   ├── sample_params.json
+├── uploads/ (populated at runtime)
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
 └── LICENSE
 ```
-
 ## Configuration
 
-- **Search Terms & Keywords:** Search terms and keywords are entered by the user.
+- **Search Terms & Keywords:** Entered by the user at runtime.
 - **Search Terms & Keywords:** Other search parameters can be modified directly in the app.py script.
 - **Database:** The SQLite database is used for caching search results and is stored in the data/ directory.
 
@@ -108,3 +107,5 @@ This project is licensed under the terms of the GNU Affero General Public Licens
 ### Commercial Use
 
 For commercial use or if you require a different licensing arrangement, please contact [ammar.halabi@gmail.com].
+
+
