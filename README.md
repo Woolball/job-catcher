@@ -10,7 +10,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/yourusername/job-matcher.git
+    git clone https://github.com/Woolball/job-matcher.git
     ```
 
 2. **Navigate to the Project Directory**:
@@ -35,7 +35,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 1. **Run the Flask Application**:
     ```bash
-    python app/app.py
+    python app.py
     ```
 
 2. **Access the Application**:
@@ -107,5 +107,3 @@ This project is licensed under the terms of the GNU Affero General Public Licens
 ### Commercial Use
 
 For commercial use or if you require a different licensing arrangement, please contact [ammar.halabi@gmail.com].
-
-
