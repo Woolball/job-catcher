@@ -12,7 +12,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/yourusername/job-matcher.git
+    git clone https://github.com/Woolball/job-matcher.git
     ```
 
 2. **Navigate to the Project Directory**:
@@ -37,7 +37,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 1. **Run the Flask Application**:
     ```bash
-    python app/app.py
+    python app.py
     ```
 
 2. **Access the Application**:
@@ -47,7 +47,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 You can provide input via either file upload or direct form entry:
 
-- **File Upload**:
+- **File Upload**: see examples in the sample_input/ directory
   - Upload a `.txt` file containing your CV.
   - Upload a `.json` file with the search parameters (see the example below).
 
@@ -74,17 +74,19 @@ After submitting the form or files, the application will display a ranked list o
 
 ## Project Structure
 
-├── app/
-│   ├── app.py
-│   ├── __init__.py
+├── app.py
+├── __init__.py
 ├── templates/
 │   ├── index.html
 │   ├── results.html
 ├── static/
 │   ├── styles.css
 ├── data/
-│   └── job_search_cache.db (optional, usually excluded)
-├── uploads/ (optional, usually added to .gitignore)
+│   └── job_search_cache.db (generated at runtime)
+├── uploads/ (uploaded at runtime)
+├── sample_input/
+│   ├── sample_cv.txt
+│   ├── sample_params.json
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
@@ -92,7 +94,8 @@ After submitting the form or files, the application will display a ranked list o
 
 ## Configuration
 
-- **Search Terms & Keywords:** Default search terms and keywords can be modified directly in the app.py script.
+- **Search Terms & Keywords:** Search terms and keywords are entered by the user.
+- **Search Terms & Keywords:** Other search parameters can be modified directly in the app.py script.
 - **Database:** The SQLite database is used for caching search results and is stored in the data/ directory.
 
 ## Contributing
@@ -106,5 +109,3 @@ This project is licensed under the terms of the GNU Affero General Public Licens
 ### Commercial Use
 
 For commercial use or if you require a different licensing arrangement, please contact [ammar.halabi@gmail.com].
-
-
