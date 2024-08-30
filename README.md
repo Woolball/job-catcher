@@ -3,10 +3,8 @@
 Job Search Matcher is a web application that allows users to rank job postings based on their CV text, using semantic and keyword matching techniques. The application leverages powerful NLP models like SBERT and TF-IDF to analyze job descriptions and match them with user profiles effectively.
 
 ## Features
-- **Flexible Input**: Users can upload their CV and search parameters as files or enter them directly via a web form.
 - **Advanced Matching**: Combines semantic similarity and keyword matching to rank job postings based on relevance to the user's CV.
-- **Caching System**: Efficient caching mechanism using SQLite to store and retrieve job search results, minimizing redundant searches and speeding up the process.
-- **Responsive Design**: A user-friendly interface built with Bootstrap for seamless interaction on all devices.
+- **Search Caching**: Efficient caching using SQLite to store and retrieve job search results, minimizing redundant searches and speeding up the process.
 
 ## Installation
 
@@ -73,7 +71,7 @@ Here's an example of a JSON file you can upload:
 After submitting the form or files, the application will display a ranked list of job postings based on their relevance to your CV. Each job listing includes the job title, company name, date posted, and a score indicating its relevance.
 
 ## Project Structure
-
+```
 ├── app.py
 ├── __init__.py
 ├── templates/
@@ -91,6 +89,7 @@ After submitting the form or files, the application will display a ranked list o
 ├── requirements.txt
 ├── .gitignore
 └── LICENSE
+```
 
 ## Configuration
 
