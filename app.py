@@ -208,7 +208,6 @@ def index():
             time_window = int(request.form['time_window'].strip())
             location = request.form['location'].strip()
             distance = int(request.form['distance'].strip())
-            results_wanted = int(request.form['results_wanted'].strip())
 
         # Process job search and ranking as before
         conn = sqlite3.connect(DB_FILE_NAME)
