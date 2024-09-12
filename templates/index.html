@@ -3,86 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Search Ranker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Job Catcher - Smarter Job Search</title>
+    <!-- MDBootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.css" rel="stylesheet">
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="card p-4">
-            <h1 class="text-center mb-4">Job Search Ranker</h1>
-            <p class="text-center">You can either upload your CV and parameters as files or fill out the form below.</p>
-            <form id="searchForm" method="POST" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="cv_file" class="form-label">Upload CV File (.txt):</label>
-                    <input type="file" id="cv_file" name="cv_file" class="form-control">
+
+    <!-- Main container for the hero section and form -->
+    <div class="container-fluid hero-section">
+        <div class="row align-items-center min-vh-100">
+
+            <!-- Left side: Hero content -->
+            <div class="col-lg-6 hero-text">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='logo.svg') }}" alt="Job Catcher Logo" class="hero-logo">
                 </div>
-
-                <div class="mb-3">
-                    <label for="params_file" class="form-label">Upload Parameters File (.json):</label>
-                    <input type="file" id="params_file" name="params_file" class="form-control">
+                <div class="p-5">
+                    <h1 class="display-3 text-white">Job Catcher</h1>
+                    <p class="lead text-white">5 minutes a day to check for jobs that match your profile</p>
                 </div>
+            </div>
 
-                <hr>
+            <!-- Right side: Form -->
+            <div class="col-lg-6">
+                <div id="form-container" class="card p-5 shadow-2-strong form-container">
+                    <h1 class="text-left mb-4 display-6 text-primary" id="form-title">Search now</h1>
 
-                <div class="mb-3">
-                    <label for="cv_text" class="form-label">Or Paste your CV text here:</label>
-                    <textarea id="cv_text" name="cv_text" rows="6" class="form-control">{{ request.form.get('cv_text', '') }}</textarea>
+                    <!-- Form and Loading/Results Sections -->
+                    <div id="form-section" class="tab-content">
+                        <!-- Manual Entry Tab -->
+                        <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+                            <form id="manualForm" method="POST" enctype="multipart/form-data" novalidate>
+
+                                <!-- Search Terms -->
+                                <div class="form-floating mb-4 position-relative">
+                                    <input type="text" id="search_terms" name="search_terms" class="form-control" placeholder="Search Terms" required>
+                                    <label for="search_terms">Search Terms (e.g., job title, skills)</label>
+                                    <i class="material-icons position-absolute top-0 end-0 mt-3 me-2 info-icon"
+                                       data-mdb-toggle="tooltip" title="Enter job titles or skills you are looking for. Separate multiple terms with commas.">info</i>
+                                </div>
+
+                                <!-- Location and Distance Filters -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 position-relative">
+                                        <div class="form-floating">
+                                            <input type="text" id="location" name="location" class="form-control" placeholder="Location" value="Detecting location..." required>
+                                            <label for="location">Location</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-4 position-relative">
+                                        <div class="form-floating">
+                                            <input type="number" id="distance" name="distance" class="form-control" placeholder="Distance in km" value="50" required>
+                                            <label for="distance">Radius (km)</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-4 position-relative">
+                                        <div class="form-floating">
+                                            <select id="posted_since" name="posted_since" class="form-select" required>
+                                                <option value="month">A month</option>
+                                                <option value="week" selected>A week</option>
+                                                <option value="3days">3 days</option>
+                                                <option value="today">1 day</option>
+                                            </select>
+                                            <label for="posted_since">Posted Since</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CV Text Input -->
+                                <div class="form-floating mb-4 position-relative">
+                                    <textarea id="cv_text" name="cv_text" class="form-control" placeholder="Paste your CV text here" rows="6" required></textarea>
+                                    <label for="cv_text">Paste your CV text here</label>
+                                    <i class="material-icons position-absolute top-0 end-0 mt-3 me-2 info-icon"
+                                       data-mdb-toggle="tooltip" title="Paste the text from your CV. Make sure it's relevant to the jobs you are applying for.">info</i>
+                                </div>
+
+                                <!-- Special Keywords -->
+                                <div class="form-floating mb-4 position-relative">
+                                    <input type="text" id="keywords" name="keywords" class="form-control" placeholder="Skill-Matching Keywords">
+                                    <label for="keywords">Skill-Matching Terms (comma-separated)</label>
+                                    <i class="material-icons position-absolute top-0 end-0 mt-3 me-2 info-icon"
+                                       data-mdb-toggle="tooltip" title="Enter specific skills or keywords you want to match in the job descriptions.">info</i>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button id="searchButton" type="button" class="btn btn-primary btn-lg btn-block">
+                            <span id="buttonText">Search</span>
+                        </button>
+
+                    </div>
+
+                    <!-- Loading Screen (hidden initially) -->
+                    <div id="loading-section" class="text-center" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-4">We're finding the best jobs for you...</p>
+                    </div>
+
+                    <!-- Results Section (hidden initially) -->
+                    <div id="results-section" class="job-results" style="display: none;">
+                        <!-- Dynamic Job Cards will be injected here -->
+                    </div>
+
                 </div>
-
-                <div class="mb-3">
-                    <label for="search_terms" class="form-label">Search Terms (comma-separated):</label>
-                    <input type="text" id="search_terms" name="search_terms" class="form-control" value="{{ request.form.get('search_terms', '') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label for="keywords" class="form-label">Skill-Matching Keywords/Keyphrases (comma-separated):</label>
-                    <input type="text" id="keywords" name="keywords" class="form-control" value="{{ request.form.get('keywords', '') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label for="time_window" class="form-label">Search Time Window (days):</label>
-                    <input type="number" id="time_window" name="time_window" class="form-control" value="{{ request.form.get('time_window', '') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label for="location" class="form-label">Location (City or Country):</label>
-                    <input type="text" id="location" name="location" class="form-control" value="{{ request.form.get('location', '') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label for="distance" class="form-label">Distance from Location (km):</label>
-                    <input type="number" id="distance" name="distance" class="form-control" value="{{ request.form.get('distance', '') }}">
-                </div>
-
-                <button id="searchButton" type="submit" class="btn btn-primary w-100" disabled>
-                    <span id="buttonText">Search</span>
-                    <span id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
-                </button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <script>
-        function checkFormFields() {
-            const fields = document.querySelectorAll("#cv_text, #search_terms, #keywords, #time_window, #location, #distance, #results_wanted");
-            const allFilled = Array.from(fields).every(input => input.value.trim() !== "") ||
-                              document.getElementById("cv_file").files.length > 0 ||
-                              document.getElementById("params_file").files.length > 0;
-            document.getElementById("searchButton").disabled = !allFilled;
-        }
+    <!-- MDBootstrap JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+    <!-- Link to external JavaScript file -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-        document.querySelectorAll("#cv_text, #search_terms, #keywords, #time_window, #location, #distance, #results_wanted")
-            .forEach(input => input.addEventListener("input", checkFormFields));
-
-        document.getElementById('cv_file').addEventListener("change", checkFormFields);
-        document.getElementById('params_file').addEventListener("change", checkFormFields);
-
-        document.getElementById('searchForm').onsubmit = function() {
-            document.getElementById('spinner').style.display = 'inline-block';
-            document.getElementById('buttonText').textContent = 'Searching...';
-            document.getElementById('searchButton').disabled = true;
-        };
-    </script>
 </body>
 </html>

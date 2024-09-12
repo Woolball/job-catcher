@@ -1,58 +1,183 @@
+/* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background: linear-gradient(to right, #e0eafc, #cfdef3);
     margin: 0;
     padding: 0;
+    font-family: 'Roboto', sans-serif;
 }
 
-.container {
-    margin-top: 50px;
+/* Hero Section */
+.hero-section {
+    background-color: #007bff;
+}
+
+.hero-text {
+    background: url('https://example.com/hero-image.jpg') no-repeat center center; /* Replace with actual image */
+    background-size: cover;
+    color: white;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+}
+
+.hero-text h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.hero-text p {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Form Container */
+.form-container {
+    background-color: white;
+    border-radius: 10px;
+    margin: 0 auto;
+    max-width: 700px; /* Adjusted for better content width on large screens */
 }
 
 .card {
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: none;
 }
 
-h1 {
-    color: #333;
+/* Form and Input Styling */
+.form-floating label {
+    color: #757575;
 }
 
-button {
-    position: relative;
-}
-
-.spinner-border {
-    display: none;
-}
-
-#spinner[style*="inline-block"] {
-    display: inline-block;
-}
-
-.list-group-item {
-    background-color: #f9f9f9;
+.form-floating .form-control {
     border-radius: 5px;
-    margin-bottom: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+    background-color: #fafafa;
+    box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
-h5 {
-    margin: 0;
+/* Button Styling */
+.btn-primary, .btn-secondary {
+    border-radius: 50px;
+    font-weight: bold;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+/* Spinner Styling */
+.spinner-border {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Job Card Styling */
+.job-card {
+    background-color: #fff;
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    padding: 20px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.job-card:hover {
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.job-card h5 {
     font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
-p.mb-1 {
-    margin: 0;
+.job-card small {
+    color: #6c757d;
+}
+
+.job-card p {
     font-size: 1rem;
     color: #555;
 }
 
-small {
-    font-size: 0.875rem;
-    color: #888;
+@media (max-width: 991.98px) {
+    .hero-text {
+        height: auto;
+        padding: 2rem;
+    }
+
+    .hero-section {
+        background: #007bff;
+    }
 }
 
-small.text-muted {
-    font-size: 0.75rem;
-    color: #666;
+/* Logo container for aligning the logo next to the text */
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px; /* Space between logo and text */
+}
+
+/* Hero Logo */
+.hero-logo {
+    max-height: 100%; /* Ensures the logo scales with the text height */
+    max-width: 100px; /* Set max width based on your design */
+    object-fit: contain; /* Ensures the logo scales properly */
+}
+
+/* Reduce left padding of text */
+.hero-text .p-5 {
+    padding-left: 0 !important;/* Optional: remove padding on the left of the text */
+}
+
+.info-icon {
+    color: #6c757d; /* Optional: You can use any color */
+    opacity: 0.6; /* This will make it 60% opaque */
+    transition: opacity 0.3s ease;
+}
+
+.info-icon:hover {
+    opacity: 1; /* Full opacity on hover */
+}
+
+/* Ensure the results section is scrollable and stays within the form container */
+#results-section {
+    max-height: calc(100vh - 200px);  /* Dynamic height based on viewport, adjust the offset as necessary */
+    overflow-y: auto;   /* Make the content scrollable */
+    overflow-y: auto;   /* Ensure it's scrollable if results are too long */
+    padding: 10px;
+}
+
+/* Style adjustments for loading screen */
+#loading-section {
+    color: #007bff;  /* Primary color theme */
+    padding: 20px;
+}
+
+#loading-section .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Adjust layout for smaller screens */
+@media (max-width: 991.98px) {
+    .logo-container {
+        justify-content: center;
+        margin-bottom: 20px; /* Adds space under the logo when stacked vertically */
+    }
 }
