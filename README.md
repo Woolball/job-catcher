@@ -1,4 +1,4 @@
-# Job Matcher
+# Job Catcher
 
 Job Search Matcher is a web application that allows users to rank job postings based on their CV text, using semantic and keyword matching. The application leverages powerful NLP models like SBERT and TF-IDF to analyze job descriptions and match them with user profiles effectively.
 
@@ -16,7 +16,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 2. **Navigate to the Project Directory**:
     ```bash
-    cd job-matcher
+    cd job-catcher
     ```
 
 3. **Set Up a Virtual Environment** (Optional but recommended):

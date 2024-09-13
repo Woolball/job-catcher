@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/job-matcher.iml" filepath="$PROJECT_DIR$/.idea/job-matcher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/job-catcher.iml" filepath="$PROJECT_DIR$/.idea/job-catcher.iml" />
     </modules>
   </component>
 </project>
