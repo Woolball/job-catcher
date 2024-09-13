@@ -20,7 +20,6 @@ from flask import Flask, request, render_template, jsonify
 import pandas as pd
 import logging
 from datetime import datetime
-from dateutil.parser import parse
 from jobspy import scrape_jobs
 
 import torch
@@ -28,7 +27,6 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
-import json
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads/'

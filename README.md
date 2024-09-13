@@ -1,10 +1,10 @@
 # Job Matcher
 
-Job Search Matcher is a web application that allows users to rank job postings based on their CV text, using semantic and keyword matching techniques. The application leverages powerful NLP models like SBERT and TF-IDF to analyze job descriptions and match them with user profiles effectively.
+Job Search Matcher is a web application that allows users to rank job postings based on their CV text, using semantic and keyword matching. The application leverages powerful NLP models like SBERT and TF-IDF to analyze job descriptions and match them with user profiles effectively.
 
 ## Features
 - **Advanced Matching**: Combines semantic similarity and keyword matching to rank job postings based on relevance to the user's CV.
-- **Search Caching**: Efficient caching mechanism using SQLite to store and retrieve job search results, minimizing redundant searches and speeding up the process.
+- **Web Interface**: Access via a simple web interface, with the local server running on the user's side.
 
 ## Installation
 
@@ -41,34 +41,20 @@ Job Search Matcher is a web application that allows users to rank job postings b
 2. **Access the Application**:
    Open your web browser and go to `http://127.0.0.1:5000`.
 
-### Input Methods
+### Providing Input
 
-You can provide input via either file upload or direct form entry:
-
-- **File Upload**:
-  - Upload a `.txt` file containing your CV.
-  - Upload a `.json` file with the search parameters (see the example below).
-
-- **Form Entry**:
-  - Paste your CV text and enter search parameters directly into the form fields.
-
-### Example JSON Parameters File
-
-Here's an example of a JSON file you can upload:
-
-```json
-{
-    "search_terms": "Product Manager, Project Manager, Digital Product Manager, Product Owner, Product Strategy, Business Analyst, Technology Consultant, Product Innovation, Agile Product Manager, Product Development",
-    "keywords": "Product Management, Strategic Planning, Roadmap, Agile, Cross-functional, Team Leadership, Market Research, Competitive Analysis, Stakeholder Management, Financial Forecasting, Data Analysis, User Research, A/B Testing, Product Analytics, Go-to-Market Strategy, Feature Prioritization, Business Growth, Customer Satisfaction, Revenue Growth, Digital Transformation",
-    "time_window": 30,
-    "location": "United States",
-    "distance": 50
-}
-```
+You can provide input directly in the web interface:
+- **Search terms:** Enter comma-separated job titles (e.g., "product manager, financial advisor").
+- **CV text:** Paste the textual content of your CV for semantic comparison.
+- **Skill-matching keywords:** Provide specific skills or keywords you want to match in job descriptions (e.g., "data analysis, project management").
 
 ### Viewing Results
 
-After submitting the form or files, the application will display a ranked list of job postings based on their relevance to your CV. Each job listing includes the job title, company name, date posted, and a score indicating its relevance.
+After submitting the form, the application will display a ranked list of job postings based on their relevance to your CV. Each job listing includes the job title, company name, date posted, and a score indicating its relevance.
+
+**Note:**
+- A maximum of 50 results are displayed in the interface. The full results, including detailed scores, are saved to a CSV file located in the `data/` directory.
+- The scores are normalized based on the job postings returned in the search.
 
 ## Project Structure
 ```
@@ -78,13 +64,11 @@ After submitting the form or files, the application will display a ranked list o
 │   ├── index.html
 │   ├── results.html
 ├── static/
+│   ├── js
+│   │   └── main.js 
 │   ├── styles.css
 ├── data/
-│   └── job_search_cache.db (populated at runtime)
-├── sample_input/
-│   ├── sample_cv.txt
-│   ├── sample_params.json
-├── uploads/ (populated at runtime)
+│   └── dump_search_scraper.csv (created at runtime)
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
@@ -92,9 +76,9 @@ After submitting the form or files, the application will display a ranked list o
 ```
 ## Configuration
 
-- **Search Terms & Keywords:** Entered by the user at runtime.
-- **Search Terms & Keywords:** Other search parameters can be modified directly in the app.py script.
-- **Database:** The SQLite database is used for caching search results and is stored in the data/ directory.
+- **Search Parameters:** Modify default job search parameters directly in `app.py`
+- **Results Storage:** By default, results are stored in a CSV file under the `data/` directory.
+- **Customizing Matching Models:** You are welcome to modify or replace the SBERT and TF-IDF models in app.py to experiment with different matching strategies.
 
 ## Contributing
 
@@ -102,8 +86,12 @@ Contributions are welcome! Please fork this repository and submit a pull request
 
 ## License
 
-This project is licensed under the terms of the GNU Affero General Public License (AGPL) v3.0. 
+This project is licensed under the terms of the GNU Affero General Public License (AGPL) v3.0.
 
 ### Commercial Use
 
-For commercial use or if you require a different licensing arrangement, please contact [ammar.halabi@gmail.com].
+For commercial use or licensing inquiries, please contact [ammar.halabi@gmail.com].
+
+## Acknowledgements
+
+This project uses the [JobSpy](https://github.com/Bunsly/JobSpy) package for job scraping functionality. Special thanks to the JobSpy team for providing this helpful tool.

@@ -1,8 +1,10 @@
 Flask==3.0.3
 python-jobspy==1.1.65
-numpy==2.1.0
+numpy==2.1.1
 pandas==2.2.2
-scikit_learn==1.5.1
+python_dateutil==2.9.0.post0
+Requests==2.32.3
+scikit_learn==1.5.2
 sentence_transformers==3.0.1
 torch==2.4.0
 transformers==4.44.2
