@@ -16,7 +16,7 @@ Job Search Matcher is a web application that allows users to rank job postings b
 
 2. **Navigate to the Project Directory**:
     ```bash
-    cd job-matcher
+    cd job-catcher
     ```
 
 3. **Set Up a Virtual Environment** (Optional but recommended):
