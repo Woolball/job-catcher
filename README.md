@@ -3,6 +3,7 @@
 Job Search Matcher is a web application that allows users to rank job postings based on their CV text, using semantic and keyword matching. The application leverages powerful NLP models like SBERT and TF-IDF to analyze job descriptions and match them with user profiles effectively.
 
 ## Features
+- **Job Search**: Fetches jobs from LinkedIn, Glassdoor, and Indeed.
 - **Advanced Matching**: Combines semantic similarity and keyword matching to rank job postings based on relevance to the user's CV.
 - **Web Interface**: Access via a simple web interface, with the local server running on the user's side.
 
