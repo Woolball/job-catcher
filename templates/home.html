@@ -1,0 +1,337 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Job Catcher - Smarter Job Search</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap Icons CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+
+        <header class="navbar navbar-expand-lg navbar-light bg-transparent fixed-top">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-briefcase me-2" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5zm1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0zM1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5z"/>
+                    </svg>
+                    <span class="fw-bold">Job Catcher</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <nav class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#how-it-works">How it works</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#support-us">Support us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about">About</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+
+            <section class="bg-gradient-purple text-white py-5 hero-section">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 mb-5 mb-lg-0">
+                            <h1 class="display-4 fw-bold mb-3" id="heroHeading">
+                                Job Catcher
+                            </h1>
+
+                            <ul class="lead mb-4 list-unstyled">
+                                <li>Aggregates & matches jobs with your profile</li>
+                                <li>Better matches, less noise, more focus</li>
+                                <li>By a job seeker, for job seekers</li>
+                            </ul>
+                            <div class="banner-tag mb-3">
+                                private, independent, open-source
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card" id="search">
+                                <div class="card-body">
+                                    <form id="jobSearchForm">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="mb-0">Search for several jobs</h5>
+                                            <button type="button" class="btn btn-link text-decoration-none p-0" data-bs-toggle="modal" data-bs-target="#tipsModal">
+                                                <i class="bi bi-lightbulb"></i> Tips
+                                            </button>
+                                        </div>
+                                        <div class="form-floating mb-3 position-relative">
+                                            <input type="text" class="form-control" id="search_terms" name="search_terms" placeholder="Job Title(s)" required>
+                                            <label for="search_terms">E.g., Product Manager, Event Coordinator</label>
+                                        </div>
+                                        <div class="row g-2 mb-3">
+                                            <!-- Country Selector with Search -->
+                                            <div class="col-md-5">
+                                                <div class="form-floating position-relative">
+                                                    <select class="form-select crs-country" id="country" name="country" data-region-id="region" required>
+                                                        <option value="" disabled selected>Select Country</option>
+                                                        <!-- Country options populated by the plugin -->
+                                                    </select>
+                                                    <label for="country">Country</label>
+                                                </div>
+                                            </div>
+
+                                            <!-- State/Region Selector with Search -->
+                                            <div class="col-md-4">
+                                                <div class="form-floating position-relative">
+                                                    <select class="form-select" id="region" name="region">
+                                                        <option value="" disabled selected>Select Region</option>
+                                                        <!-- Region options populated dynamically -->
+                                                    </select>
+                                                    <label for="region">Region</label>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-md-3">
+                                                <div class="form-floating position-relative">
+                                                    <select class="form-select" id="posted_since" name="posted_since">
+                                                        <option value="month">A month</option>
+                                                        <option value="week" selected>A week</option>
+                                                        <option value="3days">3 days</option>
+                                                        <option value="today">1 day</option>
+                                                    </select>
+                                                    <label for="posted_since">Since</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h5 class="mb-2">Your CV helps optimize the match</h5>
+                                        <p class="text-muted small mb-3">This is optional. I never store or track your data</p>
+
+                                        <div class="form-floating mb-3">
+                                            <input type="file" class="form-control" id="cv_file" name="cv_file" accept=".pdf,.docx,.rtf,.txt">
+                                            <label for="cv_file">Upload CV</label>
+                                        </div>
+
+                                        <h5 class="mb-2">Any keywords to emphasize?</h5>
+                                        <p class="text-muted small mb-3">What makes you unique, or you wish to find in a job</p>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Skill-Matching Terms">
+                                            <label for="keywords">E.g., qualitative research, senior manager</label>
+                                        </div>
+
+
+                                        <button type="submit" class="btn btn-primary w-100" id="searchButton">
+                                            <span id="searchButtonText">Search Jobs</span>
+                                            <span id="searchSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display: none;"></span>
+                                        </button>
+                                    </form>
+                                    <div id="resultsSection" class="mt-4" style="display: none;">
+                                        <div id="jobResults" class="job-results-container"></div>
+                                        <button id="newSearchButton" class="btn btn-secondary w-100 mt-3">Edit Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="how-it-works" class="section-padding bg-light">
+                <div class="container">
+                    <h2 class="text-center mb-4">How it works</h2>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <p class="lead text-center mb-5">Job search online is time-consuming, stressful, and full of irrelevant results. With Job Catcher I want to save time by focusing on highly relevant job matches. Here's how:</p>
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-search fs-2 text-primary me-3"></i>
+                                        <h4 class="mb-0">Job Ad Retrieval</h4>
+                                    </div>
+                                    <p>We collect job ads from various job boards and platforms, using the <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch">JSearch API</a>.</p>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-diagram-3 fs-2 text-primary me-3"></i>
+                                        <h4 class="mb-0">Semantic Matching</h4>
+                                    </div>
+                                    <p>We analyze the meaning of your CV and job ads for accurate matches, using an <a href="https://www.sbert.net/">SBERT</a> LLM.</p>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-list-check fs-2 text-primary me-3"></i>
+                                        <h4 class="mb-0">Traditional Matching</h4>
+                                    </div>
+                                    <p>We also perform keyword and skill matching to ensure no important terms are missed.</p>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-bar-chart-line fs-2 text-primary me-3"></i>
+                                        <h4 class="mb-0">Scoring & Ranking</h4>
+                                    </div>
+                                    <p>The results from all methods are combined into a final score, ranking the best job matches for you.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="support-us" class="section-padding">
+                <div class="container">
+                    <h2 class="text-center mb-4">Support the Project</h2>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <p class="lead text-center mb-5">Job Catcher is a free, open-source project. Your support helps us maintain and improve the service for everyone.</p>
+                            <div class="row">
+                                <div class="col-md-4 mb-4">
+                                    <div class="text-center mb-3">
+                                        <i class="bi bi-wallet2 fs-1 text-primary"></i>
+                                    </div>
+                                    <h4 class="text-center">Donate</h4>
+                                    <p class="text-center">Help with server and API costs</p>
+                                    <div class="text-center">
+                                        <a href="#" class="btn btn-outline-primary">Make a Donation</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <div class="text-center mb-3">
+                                        <i class="bi bi-github fs-1 text-primary"></i>
+                                    </div>
+                                    <h4 class="text-center">Contribute</h4>
+                                    <p class="text-center">Contribute to the code on GitHub</p>
+                                    <div class="text-center">
+                                        <a href="https://github.com/Woolball/job-catcher" class="btn btn-outline-primary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <div class="text-center mb-3">
+                                        <i class="bi bi-chat-dots fs-1 text-primary"></i>
+                                    </div>
+                                    <h4 class="text-center">Feedback</h4>
+                                    <p class="text-center">Provide feedback to help us improve</p>
+                                    <div class="text-center">
+                                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSf7xcKaJIgZsFZIcNHYBI374q3Q3HMZYSSdtvnQ7IqeZRBi6w/viewform?usp=sf_link" target="_blank" class="btn btn-outline-primary">Give Feedback</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="about" class="section-padding bg-light">
+                <div class="container">
+                    <h2 class="text-center mb-4">Hi there!</h2> <!-- Heading remains centered -->
+
+                    <div class="bio-container">
+                        <div class="bio-content">
+                            <img src="static/avatar.png" alt="Avatar" class="avatar-img">
+                            <div class="bio-text">
+                                <p class="lead">
+                                    My name is Ammar Halabi. I'm a human-centered product researcher, designer and strategist.
+                                    I also experiment with programming and ML.
+                                </p>
+                                <p class="lead">
+                                    I created Job Catcher to save on time and stress as I browsed through loads of irrelevant job ads.
+                                    It is also an opportunity to experience the full product lifecycle, from research and design to development and deployment.
+                                </p>
+                                <p class="lead">
+                                    With a background in Computer Science, AI, HCI, and Sociology, I create tech that's humane and impactful. Feel free to <a href="https://www.linkedin.com/in/ammarhalabi/">reach out!</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="py-3 bg-dark text-white">
+            <div class="container text-center">
+                <p class="mb-0">&copy; 2024 Job Catcher. Licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" class="text-white">AGPL-3.0 License</a>.</p>
+                <p class="mb-0">You are free to use, modify, and distribute this software under the same license. <a href="https://github.com/Woolball/job-catcher" target="_blank" class="text-white">Source code available on GitHub</a>.</p>
+            </div>
+        </footer>
+
+
+        <!-- Tips Modal -->
+        <div class="modal fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 align-items-start">
+                        <h5 class="modal-title" id="tipsModalLabel">Tips for Best Search Results</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="accordion" id="tipsAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        1. Catch many job ads
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#tipsAccordion">
+                                    <div class="accordion-body">
+                                        <p>Make sure to get as many jobs as possible:</p>
+                                        <ul>
+                                            <li>Enter several job titles to broaden your search.</li>
+                                            <li>Include variants of the same role. Consider adding the seniority level.</li>
+                                            <li>Don't worry about getting some irrelevant results at this stage.</li>
+                                        </ul>
+                                        <p>Examples:</p>
+                                        <ul>
+                                            <li><em>Project Manager, Senior Project Manager, Program Manager, Project Coordinator</em></li>
+                                            <li><em>Qualitative Researcher, Research Analyst, User Researcher, Market Research Analyst, Qualitative Data Analyst</em></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        2. Filter & rank top jobs
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#tipsAccordion">
+                                    <div class="accordion-body">
+                                        <p>Help us know exactly what you're looking for:</p>
+                                        <ul>
+                                            <li>Enter as many skills as needed to reflect your unique profile.</li>
+                                            <li>Include skills you excel at and want to see in your dream job.</li>
+                                            <li>Upload your CV for semantic matching with job descriptions.</li>
+                                        </ul>
+                                        <p>Examples:</p>
+                                        <ul>
+                                            <li><em>Agile methodologies, risk management, budgeting, MS Project, team leadership, conflict resolution, Prince2, resource allocation, change management, vendor management</em></li>
+                                            <li><em>Interviews, ethnographic research, thematic analysis, NVivo, research design, content analysis, grounded theory, narrative analysis, qualitative data visualization</em></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap JS and Popper.js -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Custom JavaScript -->
+        <script src="{{ url_for('static', filename='js/crs.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </body>
+    </html>

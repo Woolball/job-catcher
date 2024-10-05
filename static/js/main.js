@@ -1,82 +1,136 @@
-        // Detect user's country using geoplugin.net
-        // Location Detection (ipapi.co)
-        function detectLocation() {
-            fetch('https://ipapi.co/json/')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('location').value =  data.country_name;
-                })
-                .catch(() => {
-                    document.getElementById('location').value = '';
-                });
+document.addEventListener('DOMContentLoaded', function() {
+    const locationInput = document.getElementById('country');
+    const jobSearchForm = document.getElementById('jobSearchForm');
+    const searchButton = document.getElementById('searchButton');
+    const searchButtonText = document.getElementById('searchButtonText');
+    const searchSpinner = document.getElementById('searchSpinner');
+    const resultsSection = document.getElementById('resultsSection');
+    const jobResults = document.getElementById('jobResults');
+    const newSearchButton = document.getElementById('newSearchButton');
+    const formTitle = document.getElementById('form-title');
+    const navbar = document.querySelector('.navbar');
+
+    // Correct selector for custom file upload div
+    const fileUploadCustomDiv = document.querySelector('.custom-file-upload');
+    const fileInput = document.getElementById('cv_file');
+    const fileUploadLabel = document.querySelector('.file-upload-label');
+    const fileUploadText = document.querySelector('.file-upload-text');
+
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    // Detect user's location
+    async function detectLocation() {
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            locationInput.value = data.country_name;
+
+            // Trigger change event after setting the country value
+            const event = new Event('change');
+            locationInput.dispatchEvent(event);
+
+        } catch (error) {
+            console.error('Error detecting location:', error);
+            locationInput.value = '';
         }
+    }
 
-        detectLocation();
+    detectLocation();
 
-        // Enable tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-mdb-toggle="tooltip"]'));
-        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new mdb.Tooltip(tooltipTriggerEl);
-        });
+    // Custom validation on form submission
+    jobSearchForm.addEventListener('submit', function(event) {
+        const file = fileInput.files[0];
+        if (file) {
+            const allowedExtensions = /(\.pdf|\.docx|\.rtf|\.txt)$/i;
+            if (!allowedExtensions.exec(file.name)) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                alert('Invalid file type. Please upload a .pdf, .docx, .rtf, or .txt file.');
+                fileInput.value = ''; // Clear the input if invalid
+                return false;
+            }
+        }
+    });
 
 
+    // Handle Job Search Form Submission
+    jobSearchForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        event.stopImmediatePropagation();
+        searchButton.disabled = true;
+        searchButtonText.textContent = 'Searching...';
+        searchSpinner.style.display = 'inline-block';
+        resultsSection.style.display = 'none';
 
+        const formData = new FormData(jobSearchForm);
 
-        document.getElementById('searchButton').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            let valid = false;
-
-            // Check which tab is active and validate the form accordingly
-            if (document.getElementById('manualForm').checkValidity()) {
-                valid = true;  // Form is valid
+        try {
+            const response = await fetch('/search-jobs', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (response.ok) {
+                displayResults(data.jobs);
             } else {
-                document.getElementById('manualForm').reportValidity();  // Show validation errors
+                alert(data.error);
             }
+        } catch (error) {
+            console.error('Error fetching job results:', error);
+            alert('An error occurred while searching for jobs. Please try again.');
+        } finally {
+            searchButton.disabled = false;
+            searchButtonText.textContent = 'Search Jobs';
+            searchSpinner.style.display = 'none';
+        }
+    });
 
+    // Display Job Search Results
+    function displayResults(jobs) {
+        jobResults.innerHTML = '';
+        jobSearchForm.style.display = 'none';
+        resultsSection.style.display = 'block';
 
-            if (valid) {
-                // Show the loading section and hide the tabs & form
-                document.getElementById('form-title').textContent = 'Results';
-                document.getElementById('form-section').style.display = 'none';
-                document.getElementById('loading-section').style.display = 'block';
-
-                // Collect form data and send the AJAX request using Fetch API
-                let formData;
-                formData = new FormData(document.getElementById('manualForm'));
-
-
-                fetch('/search-jobs', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Once data is received, hide the loading section and display results
-                    document.getElementById('loading-section').style.display = 'none';
-                    document.getElementById('results-section').style.display = 'block';
-
-                    // Populate the results
-                    let resultsContainer = document.getElementById('results-section');
-                    resultsContainer.innerHTML = '';  // Clear any existing results
-
-                    data.jobs.forEach(job => {
-                        let jobCard = `
-                            <a href="${job.job_url}" target="_blank" class="list-group-item list-group-item-action job-card">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h5 class="mb-1">${job.title}</h5>
-                                    <small>${job.date_posted}</small>
-                                </div>
-                                <p class="mb-1">${job.company}</p>
-                                <small class="text-muted">Score: ${job.combined_score}</small>
-                            </a>
-                        `;
-                        resultsContainer.innerHTML += jobCard;
-                    });
-                })
-                .catch(error => {
-                    // Handle errors appropriately
-                    console.error('Error fetching job results:', error);
-                });
-            }
+        jobs.forEach(job => {
+            const jobCard = `
+                <a href="${job.job_url}" target="_blank" class="list-group-item list-group-item-action job-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="mb-1">${job.display_title}</h5>
+                        <small>${job.date_posted}</small>
+                    </div>
+                    <p class="mb-1">${job.display_company}</p>
+                    <small class="text-muted">Score: ${job.combined_score.toFixed(2)}</small>
+                </a>
+            `;
+            jobResults.innerHTML += jobCard;
         });
+    }
+
+    // New Search Button
+    newSearchButton.addEventListener('click', function() {
+        jobSearchForm.style.display = 'block';
+        resultsSection.style.display = 'none';
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Change navbar background on scroll
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+});
+
