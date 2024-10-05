@@ -17,8 +17,40 @@ app.config.from_object(Config)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Define the job fetching function globally
-job_fetching_function = None
+
+def load_fetcher_modules(fetcher_dir):
+    """Dynamically load fetchers modules from the specified directory."""
+    fetcher_modules = {}
+
+    for filename in os.listdir(fetcher_dir):
+        if filename.endswith(".py") and filename != "__init__.py":
+            module_name = filename[:-3]  # Remove the .py extension
+            module_path = f"src.fetchers.{module_name}"
+
+            # Dynamically import the module
+            module = importlib.import_module(module_path)
+
+            # Ensure the module provides a `fetch_jobs` function
+            if hasattr(module, 'fetch_jobs'):
+                fetcher_modules[module_name] = module.fetch_jobs
+            else:
+                logger.warning(f"Module {module_name} does not have a 'fetch_jobs' function")
+
+    return fetcher_modules
+
+# Initialize job fetching function based on configuration
+def load_job_fetching_function(fetcher_name, fetcher_modules):
+    """Initialize the job fetching function based on the specified fetcher name."""
+    if fetcher_name in fetcher_modules:
+        logger.info(f"Using {fetcher_name}-based job fetching.")
+        return fetcher_modules[fetcher_name]
+    else:
+        raise ValueError(f"Unknown fetcher: {fetcher_name}. Check the .env setting and your fetcher implementation in src/fetchers/")
+
+
+# Load fetcher modules and initialize job fetching function
+fetcher_modules = load_fetcher_modules("src/fetchers")
+job_fetching_function = load_job_fetching_function(Config.FETCHER_NAME, fetcher_modules)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -50,47 +82,5 @@ def handle_file_size_error(e):
     return jsonify({'error': 'File size exceeds the limit.'}), 413
 
 
-def load_fetcher_modules(fetcher_dir):
-    """Dynamically load fetchers modules from the specified directory."""
-    fetcher_modules = {}
-
-    for filename in os.listdir(fetcher_dir):
-        if filename.endswith(".py") and filename != "__init__.py":
-            module_name = filename[:-3]  # Remove the .py extension
-            module_path = f"src.fetchers.{module_name}"
-
-            # Dynamically import the module
-            module = importlib.import_module(module_path)
-
-            # Ensure the module provides a `fetch_jobs` function
-            if hasattr(module, 'fetch_jobs'):
-                fetcher_modules[module_name] = module.fetch_jobs
-            else:
-                logger.warning(f"Module {module_name} does not have a 'fetch_jobs' function")
-
-    return fetcher_modules
-
-
-def main(fetcher, fetcher_modules):
-    """Main function to run the Flask app with dynamic job fetcher selection."""
-    global job_fetching_function
-    if fetcher in fetcher_modules:
-        logger.info(f"Using {fetcher}-based job fetching.")
-        job_fetching_function = fetcher_modules[fetcher]
-    else:
-        raise ValueError(f"Unknown fetcher: {fetcher}")
-
-    app.run(debug=True, port=5001)
-
-
 if __name__ == '__main__':
-    # Load fetchers modules from the src/fetchers/ directory
-    fetcher_modules = load_fetcher_modules("src/fetchers")
-
-    # Argument parser to dynamically populate fetcher from fetchers modules
-    parser = argparse.ArgumentParser(description="Run the Job Matcher app with dynamically loaded job fetchers.")
-    parser.add_argument('--fetcher', choices=fetcher_modules.keys(), default='scraper',
-                        help="Specify the job fetcher.")
-
-    args = parser.parse_args()
-    main(args.fetcher, fetcher_modules)
+    app.run(port=5000)

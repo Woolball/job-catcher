@@ -16,3 +16,6 @@ __pycache__/
 
 # Uploads directory
 uploads/
+
+#environment file
+.env

@@ -1,0 +1,1 @@
+web: gunicorn app:app --fetcher jsearch --workers 1 --threads 4

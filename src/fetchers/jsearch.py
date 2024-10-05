@@ -4,22 +4,21 @@ import redis
 import time
 import asyncio
 import aiohttp
-
+from config import Config
 
 # Constants for JSearch
-API_URL = "https://jsearch.p.rapidapi.com/search"
+API_URL = Config.JSEARCH_API_URL
 API_HEADERS = {
-    "x-rapidapi-key": "a2c0c7dbbbmsh7763bc67db5fb89p19c47fjsnc7961706acac",
-    "x-rapidapi-host": "jsearch.p.rapidapi.com"
+    "x-rapidapi-key": Config.JSEARCH_API_KEY,
+    "x-rapidapi-host": Config.JSEARCH_API_HOST
 }
-EXCLUDED_JOB_PUBLISHERS = "BeBee, Learn4Good, Joinrs"
-RATE_LIMIT_CALLS = 5  # Number of allowed API calls
-RATE_LIMIT_PERIOD = 1.1  # Time period in seconds (1 second for 5 calls)
+RATE_LIMIT_CALLS = Config.JSEARCH_API_RATE_LIMIT_CALLS  # Number of allowed API calls
+RATE_LIMIT_PERIOD = Config.JSEARCH_API_RATE_LIMIT_PERIOD + 0.1  # Time period in seconds (add 0.1  sec as safety buffer)
 
 logger = logging.getLogger(__name__)
 
 # Initialize Redis connection
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+redis_client = redis.StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT, db=0)
 
 # Redis key to track API call timestamps
 REDIS_KEY = "jsearch_api_call_timestamps"
@@ -87,7 +86,7 @@ async def fetch_jobs_for_search_term(session, search_term, location, radius, int
     querystring = {
         "query": f"{search_term} in {location}",
         "date_posted": interval,
-        "exclude_job_publishers": EXCLUDED_JOB_PUBLISHERS
+        "exclude_job_publishers": Config.EXCLUDED_JOB_PUBLISHERS
     }
     if radius:
         querystring["radius"] = radius
@@ -112,9 +111,11 @@ async def fetch_jobs_for_search_term(session, search_term, location, radius, int
 
 
 async def fetch_jobs(search_terms, location, radius, interval):
-    """
-    Fetch jobs concurrently for multiple search terms, while respecting the API rate limit.
-    """
+    """Fetch jobs concurrently for multiple search terms, while respecting the API rate limit."""
+    if not Config.JSEARCH_API_KEY:
+        logger.error("JSearch API key is missing. Please set JSEARCH_API_KEY in the environment.")
+        raise ValueError("API key is missing. Please configure the API key in the environment.")
+
     async with aiohttp.ClientSession() as session:
         # Create a list of tasks for each search term
         tasks = [
