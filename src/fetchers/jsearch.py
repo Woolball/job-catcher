@@ -9,7 +9,7 @@ import aiohttp
 # Constants for JSearch
 API_URL = "https://jsearch.p.rapidapi.com/search"
 API_HEADERS = {
-    "x-rapidapi-key": "a2c0c7dbbbmsh7763bc67db5fb89p19c47fjsnc7961706acac",
+    "x-rapidapi-key": "PROVIDE KEY",
     "x-rapidapi-host": "jsearch.p.rapidapi.com"
 }
 EXCLUDED_JOB_PUBLISHERS = "BeBee, Learn4Good, Joinrs"
