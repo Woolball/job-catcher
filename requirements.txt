@@ -22,7 +22,6 @@ webdriver-manager~=4.0.2
 reportlab~=4.2.2
 sentence-transformers~=3.1.1
 scikit-learn~=1.5.2
-spacy~=3.7.6
 python-dateutil~=2.9.0.post0
 python-dotenv~=1.0.1
 
