@@ -81,6 +81,10 @@ def search_jobs():
 def handle_file_size_error(e):
     return jsonify({'error': 'File size exceeds the limit.'}), 413
 
+@app.route('/healthz', methods=['GET'])
+def health_check():
+    """Health check endpoint to ensure the app is running."""
+    return jsonify({"status": "healthy"}), 200
 
 if __name__ == '__main__':
     app.run(port=5000)
