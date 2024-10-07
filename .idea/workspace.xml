@@ -4,15 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e098872-2c23-479e-9f65-3df91b169743" name="Changes" comment="Donation option added">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/dump_search.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/dump_search_jsearch.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/dump_search_scraper.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ranking.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ranking.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/main.js" afterDir="false" />
+    <list default="true" id="0e098872-2c23-479e-9f65-3df91b169743" name="Changes" comment="Error handling for empty search results.">
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -267,7 +260,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728301438218</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Error handling for empty search results.">
+      <option name="closed" value="true" />
+      <created>1728331454250</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1728331454250</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TerminalProjectNonSharedOptionsProvider">
@@ -290,6 +291,7 @@
     <MESSAGE value="v0.5-alpha1&#10;- Added healthcheck endpoint for deployment" />
     <MESSAGE value="requirements.txt fixed" />
     <MESSAGE value="Donation option added" />
-    <option name="LAST_COMMIT_MESSAGE" value="Donation option added" />
+    <MESSAGE value="Error handling for empty search results." />
+    <option name="LAST_COMMIT_MESSAGE" value="Error handling for empty search results." />
   </component>
 </project>
