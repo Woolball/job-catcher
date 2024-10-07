@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e098872-2c23-479e-9f65-3df91b169743" name="Changes" comment="v0.5-alpha1&#10;- Code modularization&#10;- Two job fetchers: jobspy scraper, jsearch API&#10;- Enhanced mathing logic&#10;- Improved, user-tested frontend&#10;- API rate limit control with Redis&#10;- CV file upload&#10;- Minimize mandatory input fields for users" />
+    <list default="true" id="0e098872-2c23-479e-9f65-3df91b169743" name="Changes" comment="requirements.txt fixed">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -202,7 +205,47 @@
       <option name="project" value="LOCAL" />
       <updated>1728291743704</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="v0.5-alpha1&#10;- Code modularization&#10;- Two job fetchers: jobspy scraper, jsearch API&#10;- Enhanced mathing logic&#10;- Improved, user-tested frontend&#10;- API rate limit control with Redis&#10;- CV file upload&#10;- Minimize mandatory input fields for users">
+      <option name="closed" value="true" />
+      <created>1728291923790</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1728291923790</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Merge remote-tracking branch 'github/master'&#10;&#10;# Conflicts:&#10;#&#9;src/fetchers/jsearch.py">
+      <option name="closed" value="true" />
+      <created>1728292032498</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1728292032498</updated>
+    </task>
+    <task id="LOCAL-00014" summary="v0.5-alpha1&#10;- Code modularization&#10;- Two job fetchers: jobspy scraper, jsearch API&#10;- Enhanced mathing logic&#10;- Improved, user-tested frontend&#10;- API rate limit control with Redis&#10;- CV file upload&#10;- Minimize mandatory input fields for users">
+      <option name="closed" value="true" />
+      <created>1728292321632</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1728292321632</updated>
+    </task>
+    <task id="LOCAL-00015" summary="v0.5-alpha1&#10;- Added healthcheck endpoint for deployment">
+      <option name="closed" value="true" />
+      <created>1728293053549</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1728293053549</updated>
+    </task>
+    <task id="LOCAL-00016" summary="requirements.txt fixed">
+      <option name="closed" value="true" />
+      <created>1728293234517</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1728293234517</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TerminalProjectNonSharedOptionsProvider">
@@ -220,7 +263,10 @@
     <MESSAGE value="Update README.md" />
     <MESSAGE value="Module configuration + project navigation instructions" />
     <MESSAGE value="v0.5-alpha1:&#10;- Code modularization&#10;- Two job fetchers: jobspy scraper, jsearch API&#10;- Enhanced mathing logic&#10;- Improved, user-tested frontend&#10;- API rate limit control with Redis&#10;- CV file upload&#10;- Minimize mandatory input fields for users" />
+    <MESSAGE value="Merge remote-tracking branch 'github/master'&#10;&#10;# Conflicts:&#10;#&#9;src/fetchers/jsearch.py" />
     <MESSAGE value="v0.5-alpha1&#10;- Code modularization&#10;- Two job fetchers: jobspy scraper, jsearch API&#10;- Enhanced mathing logic&#10;- Improved, user-tested frontend&#10;- API rate limit control with Redis&#10;- CV file upload&#10;- Minimize mandatory input fields for users" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.5-alpha1&#10;- Code modularization&#10;- Two job fetchers: jobspy scraper, jsearch API&#10;- Enhanced mathing logic&#10;- Improved, user-tested frontend&#10;- API rate limit control with Redis&#10;- CV file upload&#10;- Minimize mandatory input fields for users" />
+    <MESSAGE value="v0.5-alpha1&#10;- Added healthcheck endpoint for deployment" />
+    <MESSAGE value="requirements.txt fixed" />
+    <option name="LAST_COMMIT_MESSAGE" value="requirements.txt fixed" />
   </component>
 </project>
