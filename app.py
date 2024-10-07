@@ -8,6 +8,7 @@ from src.ranking import rank_job_descriptions
 from src.utils import validate_and_clean_input, dump_ranked_jobs, process_job_dataframe
 import logging
 import asyncio
+import gc
 
 # Flask app setup
 app = Flask(__name__)
@@ -69,10 +70,21 @@ def search_jobs():
 
     # Use the dynamically selected job fetching function
     all_jobs_df = asyncio.run(job_fetching_function(result['search_terms'], result['location'], Config.DEFAULT_RADIUS, result['interval']))
+
+    # Check if the DataFrame is empty (i.e., no jobs found)
+    if all_jobs_df.empty:
+        return jsonify({
+            'jobs': [],
+            'message': 'No jobs found 😔. Please try again with different terms or locations.'
+        }), 200  # Return a 200 status code with an empty job list and a message.
+
     all_jobs_df = process_job_dataframe(all_jobs_df)
     ranked_jobs_df = rank_job_descriptions(result['cv_text'], all_jobs_df, result['keywords'])
     dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
     ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'combined_score', 'display_company', 'date_posted']].head(Config.RESULTS_WANTED).to_dict(orient='records')
+
+    del all_jobs_df, ranked_jobs_df # Free DataFrames explicitly after use
+    gc.collect() # Force garbage collection
     return jsonify({'jobs': ranked_jobs})
 
 

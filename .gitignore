@@ -19,3 +19,6 @@ uploads/
 
 #environment file
 .env
+
+# Data directory
+data/

@@ -26,6 +26,7 @@ def calculate_similarity_scores(cv_text, job_texts, keywords_list):
         tfidf_scores = calculate_tfidf_scores(cv_text, job_texts)
         embeddings = sbert_model.encode([cv_text] + job_texts, convert_to_tensor=True).cpu().numpy()
         sbert_scores = cosine_similarity(embeddings[0:1], embeddings[1:]).flatten()
+        del embeddings # Manually delete the embeddings tensor to free memory
     keyword_scores = calculate_keyword_scores(keywords_list, job_texts)
     return tfidf_scores, sbert_scores, keyword_scores
 

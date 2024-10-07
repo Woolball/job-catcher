@@ -73,7 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const data = await response.json();
             if (response.ok) {
-                displayResults(data.jobs);
+                // Check if jobs are available
+                if (data.jobs.length === 0) {
+                    displayNoJobsMessage(data.message || "No jobs found. Please try different keywords.");
+                } else {
+                    displayResults(data.jobs);
+                }
             } else {
                 alert(data.error);
             }
@@ -86,6 +91,18 @@ document.addEventListener('DOMContentLoaded', function() {
             searchSpinner.style.display = 'none';
         }
     });
+
+        // Display No Jobs Found Message
+        function displayNoJobsMessage(message) {
+            jobResults.innerHTML = `
+                <div class="alert alert-warning" role="alert">
+                    ${message}
+                </div>
+            `;
+            jobSearchForm.style.display = 'none';
+            resultsSection.style.display = 'block';
+        }
+
 
     // Display Job Search Results
     function displayResults(jobs) {
