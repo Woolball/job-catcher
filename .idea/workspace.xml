@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e098872-2c23-479e-9f65-3df91b169743" name="Changes" comment="Fixed data drictory creation">
+    <list default="true" id="0e098872-2c23-479e-9f65-3df91b169743" name="Changes" comment="Frontend Tweaks&#10;- Better font sizing &amp; spacing for smaller screens&#10;- Logo &amp; favicon provided">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/fetchers/jsearch.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/fetchers/jsearch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/favicon/apple-touch-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/favicon/apple-touch-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/favicon/favicon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/favicon/favicon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/favicon/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/static/favicon/site.webmanifest" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/favicon/web-app-manifest-192x192.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/favicon/web-app-manifest-192x192.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/favicon/web-app-manifest-512x512.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/favicon/web-app-manifest-512x512.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -281,7 +282,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728335827908</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Frontend Tweaks&#10;- Better font sizing &amp; spacing for smaller screens&#10;- Logo &amp; favicon provided">
+      <option name="closed" value="true" />
+      <created>1728384509913</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1728384509913</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TerminalProjectNonSharedOptionsProvider">
@@ -306,6 +315,7 @@
     <MESSAGE value="Donation option added" />
     <MESSAGE value="Error handling for empty search results." />
     <MESSAGE value="Fixed data drictory creation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed data drictory creation" />
+    <MESSAGE value="Frontend Tweaks&#10;- Better font sizing &amp; spacing for smaller screens&#10;- Logo &amp; favicon provided" />
+    <option name="LAST_COMMIT_MESSAGE" value="Frontend Tweaks&#10;- Better font sizing &amp; spacing for smaller screens&#10;- Logo &amp; favicon provided" />
   </component>
 </project>
