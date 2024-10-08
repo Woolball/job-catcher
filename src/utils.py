@@ -141,7 +141,7 @@ def process_job_dataframe(jobs_df):
         jobs_df['date_posted'] = jobs_df['date_posted'].apply(
             lambda date_value: pd.to_datetime(date_value, errors='coerce').strftime("%b %d"))
         jobs_df['display_title'] = jobs_df['title'].fillna('').str.strip()
-        jobs_df['display_company'] = jobs_df['company'].fillna('').str.strip()
+        jobs_df['display_company'] = jobs_df['company'].fillna('').str.strip().str.title()
         jobs_df['title'] = jobs_df['display_title'].apply(preprocess_text)
         jobs_df['description'] = jobs_df['description'].fillna('').apply(preprocess_text)
         jobs_df['description'] = jobs_df['title'] + ' ' + jobs_df['description']

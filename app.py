@@ -68,6 +68,7 @@ def search_jobs():
     if isinstance(result, tuple) and result[1] == 400:
         return result
 
+    logger.info(f"Incoming request. Terms: {result['search_terms']} - Location: {result['location']} - Posted since: {result['interval']}")
     # Use the dynamically selected job fetching function
     all_jobs_df = asyncio.run(job_fetching_function(result['search_terms'], result['location'], Config.DEFAULT_RADIUS, result['interval']))
 

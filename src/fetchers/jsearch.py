@@ -55,12 +55,9 @@ async def enforce_rate_limit():
         current_time = time.time()
         # Retrieve all timestamps from the Redis list
         timestamps = redis_client.lrange(REDIS_KEY, 0, -1)
-        print(f"All timestamps: {timestamps}")
         # Convert Redis bytes to float timestamps and filter out timestamps older than 1 second
         valid_timestamps = [float(ts.decode()) for ts in timestamps if
                             float(ts.decode()) > current_time - RATE_LIMIT_PERIOD]
-        print(f"Time back: {current_time - RATE_LIMIT_PERIOD}")
-        print(f"Valid timestamps: {valid_timestamps}")
         # Remove old timestamps from Redis (timestamps older than 1 second)
         if len(valid_timestamps) == 0:
             redis_client.delete(REDIS_KEY)
@@ -96,7 +93,6 @@ async def fetch_jobs_for_search_term(session, search_term, location, radius, int
 
     # Log the request time in Redis **before** sending the request
     redis_client.rpush(REDIS_KEY, time.time())
-    print(f"Pushing to Redis at time: {time.time()}")
 
     # Make the request asynchronously
     data = await make_jsearch_api_request(session, querystring)

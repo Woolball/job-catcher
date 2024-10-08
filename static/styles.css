@@ -19,7 +19,7 @@
     background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
     padding: 5px 10px;
-    font-size: 0.85rem;
+    font-size: calc(0.55rem + 0.30vw);
     font-weight: 500;
     border-radius: 20px;
     text-transform: uppercase;
@@ -55,7 +55,7 @@ textarea.form-control {
 }
 
 .section-padding {
-    padding: 80px 0;
+    padding: calc(6vw) calc(3vw) calc(6vw) calc(3vw);
 }
 
 .card {
@@ -153,6 +153,10 @@ textarea.form-control {
 /* Fix hamburger menu button lines color */
 .navbar-toggler-icon {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255, 255, 255, 1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}navbar-togg
+
+.navbar-collapse a {
+    color: black !important;
 }
 
 .job-card {
@@ -173,7 +177,7 @@ textarea.form-control {
 }
 
 .job-card h5 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
@@ -296,21 +300,15 @@ footer a:hover {
     margin-bottom: 1rem;
 }
 
-/* Ensure consistent styling for the last form element before the button */
-#jobSearchForm .form-floating:last-of-type {
-    margin-bottom: 1.5rem;
+
+
+.row, .row>*{
+    margin-top: 0;
 }
 
-    .custom-file-upload {
-        display: flex;
-        align-items: center;
-        border: 1px solid rgb(222, 226, 230);
-        border-radius: 5px;
-        padding: 10px 0 10px 0;
-        height: 58px;
-        background-color: #fafafa;
-        box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.1);
-    }
+.row{
+    margin-bottom:0 !important;
+}
 
     .file-upload-label {
         color: #6c757d;
@@ -430,6 +428,10 @@ footer a:hover {
   margin-right: 10px;
 }
 
+.list-unstyled {
+    font-size: calc(1rem + 0.2vw);
+}
+
 #heroHeading {
     display: flex;
     align-items: center;
@@ -449,7 +451,7 @@ footer a:hover {
 
 /* Floating labels should resize based on form width */
 .form-floating label {
-    font-size: calc(1rem); /* Adjusted for form width */
+    font-size: calc(0.95rem); /* Adjusted for form width */
     line-height: 1;
     padding-top: 1rem;
 }
@@ -476,6 +478,11 @@ footer a:hover {
         font-size: 1.1rem; /* Increase input text size */
     }
 }
+
+.lead {
+    font-size: calc(1rem + 0.3vw);
+}
+
 
 .avatar-img {
     position: absolute;
