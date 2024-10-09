@@ -1,6 +1,11 @@
-# Job Catcher
+<div style="float: left;">
+   <img src="/static/favicon/favicon-48x48.png">
+</div>
+<h1>Job Catcher</h1>
 
 Job Catcher is a web application that allows users to rank job postings based on their CV text, using semantic and keyword matching. The application combines different approaches (SBERT, TF-IDF, and keyword scoring) to analyze job descriptions and match them with user profiles effectively.
+
+**See the live website: https://job-catcher.onrender.com/**
 
 ## Features
 - **Job Aggregator**: Fetches jobs from LinkedIn, Glassdoor, and Indeed.
@@ -44,6 +49,24 @@ Job Catcher is a web application that allows users to rank job postings based on
     redis-cli ping
     ```
     If Redis is running, it should return `PONG`.
+6. **Configure the Environment Variables**:
+   Create a `.env` file in the root directory with the following content:
+
+    ```
+    JSEARCH_API_URL=https://jsearch.p.rapidapi.com/search
+    JSEARCH_API_KEY=
+    JSEARCH_API_HOST=jsearch.p.rapidapi.com
+    JSEARCH_API_RATE_LIMIT_CALLS=5
+    JSEARCH_API_RATE_LIMIT_PERIOD=1
+
+    REDIS_HOST=localhost
+    REDIS_PORT=6379
+
+    FETCHER=scraper  # or 'jsearch' if you want to use the JSearch API
+    ```
+
+    Provide a value for `JSEARCH_API_KEY` with your actual JSearch API key if you want to use the jsearch fetcher. Using the **JSearch API** fetcher is more efficient, but [requires registration & API key](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch).
+
 
 ## Usage
 
@@ -56,19 +79,9 @@ Job Catcher is a web application that allows users to rank job postings based on
     ```
 
 2. **Run the Flask Application**:
-    You can start the application using one of the following fetchers:
-
-    - Using the **scraper** fetcher:
       ```bash
-      python app.py --fetcher scraper 
+      python app.py 
       ```
-
-    - Using the **JSearch API** fetcher (more efficient, but requires API key):
-      ```bash
-      python app.py --fetcher jsearch 
-      ```
-   Note: You can also implement your own fetcher with other scrapers or API. Follow the code conventions in `src/fetchers/scraper.py`.
-
 3. **Access the Application**:
    Open your web browser and go to `http://127.0.0.1:5001`.
 
@@ -114,7 +127,7 @@ After submitting the form, the application will display a ranked list of job pos
 ```
 ## Configuration
 
-- **Search Parameters:** Modify default the search parameters directly in `src/config.py`
+- **App Parameters:** Modify default the app's parameters in `src/config.py` and in your `/.env` file. Notably, you can select which of the two fetchers to use for retrieving job ads. You can also implement your own fetcher with other scrapers or API. Follow the code conventions in `src/fetchers/scraper.py`.
 - **Results Storage:** By default, results of the latest search are stored in a CSV file under the `data/` directory (refreshed after each search).
 - **Customizing Matching Logic:** You are welcome to modify or replace the job-matching logic implemented in `src/models.py` and `src/ranking.py` to experiment with different matching strategies.
 
