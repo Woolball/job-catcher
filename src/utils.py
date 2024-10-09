@@ -35,18 +35,21 @@ def get_file_mime_type(file_path):
 
 def extract_text_from_file(file_path, mime_type):
     """Extracts text from different file formats based on MIME type and limits it to 2000 words."""
-    if mime_type == 'application/pdf':
-        text = extract_text_from_pdf(file_path)
-    elif mime_type in ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']:
-        text = extract_text_from_docx(file_path)
-    elif mime_type == 'application/rtf':
-        text = extract_text_from_rtf(file_path)
-    elif mime_type == 'text/plain':
-        text = extract_text_from_txt(file_path)
-    else:
-        raise ValueError(f"Unsupported file type: {mime_type}")
-
-    return text
+    try:
+        if mime_type == 'application/pdf':
+            text = extract_text_from_pdf(file_path)
+        elif mime_type in ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']:
+            text = extract_text_from_docx(file_path)
+        elif mime_type == 'application/rtf':
+            text = extract_text_from_rtf(file_path)
+        elif mime_type == 'text/plain':
+            text = extract_text_from_txt(file_path)
+        else:
+            raise ValueError(f"Unsupported file type: {mime_type}")
+        return text
+    except Exception as e:
+        logger.error(f"Error extracting text from file {file_path}: {str(e)}")
+        raise ValueError(f"Failed to process file: {file_path}. Error: {str(e)}")
 
 
 def extract_text_from_pdf(file_path):

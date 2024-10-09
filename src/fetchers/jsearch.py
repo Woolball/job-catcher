@@ -14,7 +14,7 @@ API_HEADERS = {
     "x-rapidapi-host": Config.JSEARCH_API_HOST
 }
 RATE_LIMIT_CALLS = Config.JSEARCH_API_RATE_LIMIT_CALLS  # Number of allowed API calls
-RATE_LIMIT_PERIOD = Config.JSEARCH_API_RATE_LIMIT_PERIOD + 0.1  # Time period in seconds (add 0.1 sec as safety buffer)
+RATE_LIMIT_PERIOD = Config.JSEARCH_API_RATE_LIMIT_PERIOD  # Time period in seconds
 
 logger = logging.getLogger(__name__)
 
@@ -55,16 +55,17 @@ async def enforce_rate_limit():
         try:
             timestamps = redis_client.lrange(REDIS_KEY, 0, -1)
             valid_timestamps = [float(ts.decode()) for ts in timestamps if float(ts.decode()) > current_time - RATE_LIMIT_PERIOD]
+            print(valid_timestamps)
+
+            # **Trim the Redis list to only valid timestamps** (those within the RATE_LIMIT_PERIOD)
+            redis_client.ltrim(REDIS_KEY, -len(valid_timestamps), -1)
 
             # If we have room to make an API call, proceed
             if len(valid_timestamps) < RATE_LIMIT_CALLS:
                 break
 
             logger.info("Rate limit hit. Waiting for 1 second...")
-            await asyncio.sleep(RATE_LIMIT_PERIOD)  # Wait for 1 second
-
-            # Remove old timestamps from Redis
-            redis_client.ltrim(REDIS_KEY, -len(valid_timestamps), -1)
+            await asyncio.sleep(RATE_LIMIT_PERIOD + 0.5) # Wait for 1 second plus 0.5 for safety
 
         except redis.exceptions.RedisError as e:
             logger.error(f"Redis error during rate limit enforcement: {e}")
@@ -115,18 +116,24 @@ async def fetch_jobs(search_terms, location, radius, interval):
     Fetch jobs concurrently for multiple search terms, handling retries, rate limits, and errors.
     """
     if not Config.JSEARCH_API_KEY:
-        raise ValueError("JSearch API key is missing. Please configure the API key in the environment.")
+        raise ValueError("JSearch API key is missing. Please set JSEARCH_API_KEY in the environment.")
 
     async with aiohttp.ClientSession() as session:
         tasks = [fetch_jobs_for_search_term(session, term, location, radius, interval) for term in search_terms]
-        results = await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Process results
         all_jobs_df = pd.DataFrame()
         for data in results:
-            if data:
+            # Skip any failed tasks or invalid results (like dicts or errors)
+            if isinstance(data, Exception):
+                logger.error(f"Error in search task: {data}")
+                continue
+            if isinstance(data, dict) and 'data' in data:
                 jobs_df = pd.DataFrame(data.get('data', []))
                 jobs_df = rename_jsearch_columns(jobs_df)
                 all_jobs_df = pd.concat([all_jobs_df, jobs_df], ignore_index=True)
+            else:
+                logger.warning(f"Unexpected result type: {type(data)}, skipping this result.")
 
         return all_jobs_df.drop_duplicates(subset=['title', 'company'])

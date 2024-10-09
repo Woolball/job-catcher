@@ -49,7 +49,6 @@ def load_job_fetching_function(fetcher_name, fetcher_modules):
         available_fetchers = ', '.join(fetcher_modules.keys())
         raise ValueError(f"Unknown fetcher: {fetcher_name}. Available fetchers: {available_fetchers}. Check the .env setting and your fetcher implementation in src/fetchers/")
 
-
 # Load fetcher modules and initialize job fetching function
 fetcher_modules = load_fetcher_modules("src/fetchers")
 job_fetching_function = load_job_fetching_function(Config.FETCHER_NAME, fetcher_modules)

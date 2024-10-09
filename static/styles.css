@@ -13,7 +13,6 @@
     overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
-
 .banner-tag {
     display: inline-block;
     background-color: rgba(255, 255, 255, 0.1);
@@ -24,6 +23,10 @@
     border-radius: 20px;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+.mb-5 {
+    margin-bottom: calc(1rem + 1vw) !important;
 }
 
 .form-control,

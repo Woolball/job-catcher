@@ -16,7 +16,7 @@ def fetch_jobs(search_terms, location, radius, interval, retries=3, backoff_fact
             distance=radius,
             results_wanted=Config.RESULTS_WANTED,
             hours_old=Config.INTERVAL_MAPPING.get(interval, 30) * 24,
-            country_indeed= location.split(', '),
+            country_indeed= location.split(', ')[-1],
             linkedin_fetch_description=True,
         )
         all_jobs_df = pd.concat([all_jobs_df, jobs_df], ignore_index=True)
