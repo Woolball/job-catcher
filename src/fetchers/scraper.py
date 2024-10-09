@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def fetch_jobs(search_terms, location, radius, interval):
+def fetch_jobs(search_terms, location, radius, interval, retries=3, backoff_factor=0.5):
     all_jobs_df = pd.DataFrame()
     for search_term in search_terms:
         jobs_df = scrape_jobs(

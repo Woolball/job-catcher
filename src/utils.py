@@ -10,6 +10,10 @@ from werkzeug.utils import secure_filename
 import pdfplumber
 import docx
 import pypandoc
+import logging
+
+# Initialize logger
+logger = logging.getLogger(__name__)
 
 
 delimiters = r'[^a-zA-Z\s]+'
@@ -110,7 +114,8 @@ def validate_and_clean_input(form, files):
             os.remove(file_path)  # Clean up the file after extracting the text
         except Exception as e:
             os.remove(file_path)
-            return jsonify({'error': 'Error processing CV file'}), 500
+            logger.error(f"Error processing CV file: {filename}. Exception: {str(e)}")
+            return jsonify({'error': f'Error processing CV file: {filename}'}), 500
 
         cv_text = preprocess_text(raw_cv_text)
         cv_text = ' '.join(cv_text.split()[:Config.CV_TEXT_LIMIT]) # limit cv text

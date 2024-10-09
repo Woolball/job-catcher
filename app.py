@@ -46,7 +46,8 @@ def load_job_fetching_function(fetcher_name, fetcher_modules):
         logger.info(f"Using {fetcher_name}-based job fetching.")
         return fetcher_modules[fetcher_name]
     else:
-        raise ValueError(f"Unknown fetcher: {fetcher_name}. Check the .env setting and your fetcher implementation in src/fetchers/")
+        available_fetchers = ', '.join(fetcher_modules.keys())
+        raise ValueError(f"Unknown fetcher: {fetcher_name}. Available fetchers: {available_fetchers}. Check the .env setting and your fetcher implementation in src/fetchers/")
 
 
 # Load fetcher modules and initialize job fetching function
@@ -69,24 +70,29 @@ def search_jobs():
         return result
 
     logger.info(f"Incoming request. Terms: {result['search_terms']} - Location: {result['location']} - Posted since: {result['interval']}")
-    # Use the dynamically selected job fetching function
-    all_jobs_df = asyncio.run(job_fetching_function(result['search_terms'], result['location'], Config.DEFAULT_RADIUS, result['interval']))
 
-    # Check if the DataFrame is empty (i.e., no jobs found)
-    if all_jobs_df.empty:
-        return jsonify({
-            'jobs': [],
-            'message': 'No jobs found 😔. Please try again with different terms or locations.'
-        }), 200  # Return a 200 status code with an empty job list and a message.
+    try:
+        # Use the dynamically selected job fetching function
+        all_jobs_df = asyncio.run(job_fetching_function(result['search_terms'], result['location'], Config.DEFAULT_RADIUS, result['interval']))
 
-    all_jobs_df = process_job_dataframe(all_jobs_df)
-    ranked_jobs_df = rank_job_descriptions(result['cv_text'], all_jobs_df, result['keywords'])
-    dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
-    ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'combined_score', 'display_company', 'date_posted']].head(Config.RESULTS_WANTED).to_dict(orient='records')
+        # Check if the DataFrame is empty (i.e., no jobs found)
+        if all_jobs_df.empty:
+            return jsonify({
+                'jobs': [],
+                'message': 'No jobs found 😔. Please try again with different terms or locations.'
+            }), 200  # Return a 200 status code with an empty job list and a message.
 
-    del all_jobs_df, ranked_jobs_df # Free DataFrames explicitly after use
-    gc.collect() # Force garbage collection
-    return jsonify({'jobs': ranked_jobs})
+        all_jobs_df = process_job_dataframe(all_jobs_df)
+        ranked_jobs_df = rank_job_descriptions(result['cv_text'], all_jobs_df, result['keywords'])
+        dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
+        ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'combined_score', 'display_company', 'date_posted']].head(Config.RESULTS_WANTED).to_dict(orient='records')
+
+        del all_jobs_df, ranked_jobs_df # Free DataFrames explicitly after use
+        gc.collect() # Force garbage collection
+        return jsonify({'jobs': ranked_jobs})
+    except Exception as e:
+        logger.error(f"Error fetching jobs: {str(e)}", exc_info=True)  # Log the full traceback for debugging
+        return jsonify({'error': 'An unexpected error occurred while fetching jobs 🫤. Please try again later.'}), 500
 
 
 # Error handler for file size limit

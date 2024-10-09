@@ -1,6 +1,10 @@
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from .models import sbert_model, tfidf_vectorizer
+import logging
+
+# Initialize logger
+logger = logging.getLogger(__name__)
 
 def calculate_keyword_scores(keywords_list, job_texts):
     """Calculate keyword match score based on overlap of CV and job description."""
@@ -33,6 +37,10 @@ def calculate_similarity_scores(cv_text, job_texts, keywords_list):
 
 def rank_job_descriptions(cv_text, jobs_df, keywords):
     """Rank job descriptions based on combined similarity, keyword, and TF-IDF scores."""
+    if jobs_df.empty:
+        logger.warning("Job DataFrame is empty. Skipping ranking.")
+        return jobs_df  # Return the empty DataFrame
+
     tfidf_scores, sbert_scores, keyword_scores = calculate_similarity_scores(cv_text, jobs_df['description'].tolist(), keywords)
 
     jobs_df['tfidf_score'] = tfidf_scores
