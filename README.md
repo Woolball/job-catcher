@@ -83,7 +83,7 @@ Job Catcher is a web application that allows users to rank job postings based on
       python app.py 
       ```
 3. **Access the Application**:
-   Open your web browser and go to `http://127.0.0.1:5001`.
+   Open your web browser and go to `http://127.0.0.1:5000`.
 
 ### Providing Input
 You can provide input directly in the web interface:
