@@ -15,14 +15,15 @@ import logging
 # Initialize logger
 logger = logging.getLogger(__name__)
 
-
-delimiters = r'[^a-zA-Z\s]+'
-
+delimiters = r'[,;.]+'
 
 def preprocess_text(text):
     if not text:
         return ''
-    return ''.join(c for c in text.lower().replace('\n', ' ') if c.isalnum() or c.isspace())
+    # Replace non-alphanumeric characters with spaces
+    processed_text = ''.join(c if c.isalnum() else ' ' for c in text.lower().replace('\n', ' '))
+    # Reduce consecutive spaces to a single space
+    return re.sub(r'\s+', ' ', processed_text).strip()
 
 
 def allowed_file(filename):
@@ -100,32 +101,35 @@ def validate_and_clean_input(form, files):
 
     # Validate and clean the uploaded file
     file = files.get('cv_file', None)
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(Config.UPLOAD_FOLDER, filename)
-        file.save(file_path)
+    if file:
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Unsupported CV file extension'}), 400
+        else:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(Config.UPLOAD_FOLDER, filename)
+            file.save(file_path)
 
-        # Detect MIME type
-        mime_type = get_file_mime_type(file_path)
-        if mime_type not in Config.ALLOWED_MIME_TYPES:
-            os.remove(file_path)
-            return jsonify({'error': 'Unsupported CV file type'}), 400
+            # Detect MIME type
+            mime_type = get_file_mime_type(file_path)
+            if mime_type not in Config.ALLOWED_MIME_TYPES:
+                os.remove(file_path)
+                return jsonify({'error': 'Unsupported CV file type'}), 400
 
-        # Extract and preprocess text from file
-        try:
-            raw_cv_text = extract_text_from_file(file_path, mime_type)
-            os.remove(file_path)  # Clean up the file after extracting the text
-        except Exception as e:
-            os.remove(file_path)
-            logger.error(f"Error processing CV file: {filename}. Exception: {str(e)}")
-            return jsonify({'error': f'Error processing CV file: {filename}'}), 500
+            # Extract and preprocess text from file
+            try:
+                raw_cv_text = extract_text_from_file(file_path, mime_type)
+                os.remove(file_path)
+            except Exception as e:
+                os.remove(file_path)
+                logger.error(f"Error processing CV file: {filename}. Exception: {str(e)}")
+                return jsonify({'error': f'Error processing CV file: {filename}'}), 500
 
-        cv_text = preprocess_text(raw_cv_text)
-        cv_text = ' '.join(cv_text.split()[:Config.CV_TEXT_LIMIT]) # limit cv text
+            cv_text = preprocess_text(raw_cv_text)
+            cv_text = ' '.join(cv_text.split()[:Config.CV_TEXT_LIMIT]) # limit cv text
 
-        # Check if CV text is empty after preprocessing
-        if not cv_text:
-            return jsonify({'error': 'CV file is empty or contains invalid content'}), 400
+            # Check if CV text is empty after preprocessing
+            if not cv_text:
+                return jsonify({'error': 'CV file is empty or contains invalid content'}), 400
     else:
         cv_text = ' '.join(keywords)
 
@@ -145,14 +149,14 @@ def dump_ranked_jobs(ranked_jobs_df, file_path):
 
 def process_job_dataframe(jobs_df):
     if not jobs_df.empty:
-        jobs_df['date_posted'] = jobs_df['date_posted'].fillna(datetime.today().strftime('%Y-%m-%d'))
-        jobs_df['date_posted'] = jobs_df['date_posted'].apply(
-            lambda date_value: pd.to_datetime(date_value, errors='coerce').strftime("%b %d"))
+        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce')  # Convert to datetime
+        jobs_df['date_posted'] = jobs_df['date_posted'].fillna(datetime.today())
+        jobs_df['date_posted'] = jobs_df['date_posted'].apply(lambda date_value: date_value.strftime('%b %d'))
         jobs_df['display_title'] = jobs_df['title'].fillna('').str.strip()
         jobs_df['display_company'] = jobs_df['company'].fillna('').str.strip().str.title()
         jobs_df['title'] = jobs_df['display_title'].apply(preprocess_text)
         jobs_df['description'] = jobs_df['description'].fillna('').apply(preprocess_text)
-        jobs_df['description'] = jobs_df['title'] + ' ' + jobs_df['description']
+        jobs_df['description'] = (jobs_df['title'] + ' ' + jobs_df['description']).str.strip()
         jobs_df['company'] = jobs_df['display_company'].apply(preprocess_text)
     return jobs_df
 

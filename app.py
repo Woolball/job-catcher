@@ -2,6 +2,8 @@ import os
 import importlib
 import argparse
 from flask import Flask, request, jsonify, render_template, make_response
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import RequestEntityTooLarge
 from config import Config
 from src.ranking import rank_job_descriptions
@@ -13,6 +15,13 @@ import gc
 # Flask app setup
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Set up rate limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["50 per minute"]
+)
 
 # Logging setup
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -53,6 +62,22 @@ def load_job_fetching_function(fetcher_name, fetcher_modules):
 fetcher_modules = load_fetcher_modules("src/fetchers")
 job_fetching_function = load_job_fetching_function(Config.FETCHER_NAME, fetcher_modules)
 
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "  # Only allow resources from the same origin
+        "script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com 'unsafe-inline'; "  # Allow scripts from jsdelivr.net and code.jquery.com
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "  # Allow inline styles and from jsdelivr.net
+        "img-src 'self' data:; "  # Allow images from self and data URIs
+        "font-src 'self' https://cdn.jsdelivr.net; "  # Allow fonts from jsdelivr.net
+        "connect-src 'self' https://ipapi.co; "  # Allow API calls to ipapi.co
+        "object-src 'none'; "  # Disallow object and embed elements
+        "frame-ancestors 'none'; "  # Prevent clickjacking by disallowing framing
+    )
+    return response
+
+
 @app.route('/', methods=['GET'])
 def index():
     rendered_page = render_template('home.html')
@@ -62,6 +87,7 @@ def index():
 
 
 @app.route('/search-jobs', methods=['POST'])
+@limiter.limit("10 per minute")
 def search_jobs():
     """Handle job search requests by dynamically selecting the fetcher (scraper or JSearch)."""
     result = validate_and_clean_input(request.form, request.files)
@@ -69,6 +95,10 @@ def search_jobs():
         return result
 
     logger.info(f"Incoming request. Terms: {result['search_terms']} - Location: {result['location']} - Posted since: {result['interval']}")
+    honeypot = request.form.get('jamesbond')
+    if honeypot:  # Bots will fill this, humans won't
+        logger.warning("Bot detected!")
+        return jsonify({'error': 'Something fishy is going on!'}), 400
 
     try:
         # Use the dynamically selected job fetching function
@@ -82,7 +112,7 @@ def search_jobs():
             }), 200  # Return a 200 status code with an empty job list and a message.
 
         all_jobs_df = process_job_dataframe(all_jobs_df)
-        ranked_jobs_df = rank_job_descriptions(result['cv_text'], all_jobs_df, result['keywords'])
+        ranked_jobs_df = rank_job_descriptions(all_jobs_df, result['cv_text'], result['keywords'])
         dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
         ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'combined_score', 'display_company', 'date_posted']].head(Config.RESULTS_WANTED).to_dict(orient='records')
 
