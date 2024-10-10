@@ -1,6 +1,6 @@
 Flask~=3.0.3
 python-jobspy~=1.1.65
-numpy~=2.1.1
+numpy~=1.26.3
 pandas~=2.2.2
 python_dateutil~=2.9.0.post0
 Requests~=2.32.3
