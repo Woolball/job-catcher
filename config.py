@@ -11,6 +11,7 @@ load_dotenv()
 class Config:
     UPLOAD_FOLDER = 'uploads/'
     DATA_FOLDER = 'data/'
+    STATIC_FOLDER = 'static/'
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2MB limit
     ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx', 'rtf'}
     ALLOWED_MIME_TYPES = {

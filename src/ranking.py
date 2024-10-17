@@ -25,11 +25,13 @@ def calculate_tfidf_scores(cv_text, job_texts):
 
 
 def calculate_sbert_scores(cv_text, job_texts):
+    """Calculate SBERT similarity scores between a CV and multiple job descriptions."""
     if not cv_text or not job_texts:
         return [0.0] * len(job_texts)
-    embeddings = sbert_model.encode([cv_text] + job_texts, convert_to_tensor=True).cpu().numpy()
-    sbert_scores = cosine_similarity(embeddings[0:1], embeddings[1:]).flatten()
-    del embeddings  # Manually delete the embeddings tensor to free memory
+    embeddings_cv = sbert_model.encode([cv_text])
+    embeddings_jobs = sbert_model.encode(job_texts)
+    similarities = sbert_model.similarity(embeddings_cv, embeddings_jobs)
+    sbert_scores = similarities.flatten()
     return sbert_scores
 
 

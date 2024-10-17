@@ -1,7 +1,7 @@
 import os
 import importlib
 import argparse
-from flask import Flask, request, jsonify, render_template, make_response
+from flask import Flask, request, jsonify, render_template, make_response, send_from_directory
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import RequestEntityTooLarge
@@ -133,6 +133,10 @@ def handle_file_size_error(e):
 def health_check():
     """Health check endpoint to ensure the app is running."""
     return jsonify({"status": "healthy"}), 200
+
+@app.route('/robots.txt')
+def robots_txt():
+    return send_from_directory(app.static_folder, 'robots.txt')
 
 if __name__ == '__main__':
     app.run(port=5000)

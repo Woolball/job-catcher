@@ -152,12 +152,16 @@ def process_job_dataframe(jobs_df):
         jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce')  # Convert to datetime
         jobs_df['date_posted'] = jobs_df['date_posted'].fillna(datetime.today())
         jobs_df['date_posted'] = jobs_df['date_posted'].apply(lambda date_value: date_value.strftime('%b %d'))
-        jobs_df['display_title'] = jobs_df['title'].fillna('').str.strip()
-        jobs_df['display_company'] = jobs_df['company'].fillna('').str.strip().str.title()
+        jobs_df['display_title'] = jobs_df['title'].fillna('').replace('', 'Unknown').str.strip()
+        jobs_df['display_company'] = jobs_df['company'].fillna('').replace('', 'Unknown').str.strip().str.title()
         jobs_df['title'] = jobs_df['display_title'].apply(preprocess_text)
         jobs_df['description'] = jobs_df['description'].fillna('').apply(preprocess_text)
         jobs_df['description'] = (jobs_df['title'] + ' ' + jobs_df['description']).str.strip()
         jobs_df['company'] = jobs_df['display_company'].apply(preprocess_text)
+        # Drop duplicates based on display titles and 1st word of display company
+        jobs_df['first_word_company'] = jobs_df['display_company'].str.split().str[0]
+        jobs_df = jobs_df.drop_duplicates(subset=['display_title', 'first_word_company'])
+        jobs_df = jobs_df.drop(columns=['first_word_company'])
     return jobs_df
 
 

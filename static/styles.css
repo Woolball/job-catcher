@@ -366,11 +366,29 @@ footer a:hover {
     font-weight: 600;
     border-radius: 10px !important;
     box-shadow: none !important;
+    display: flex;
+    align-items: center; /* Align icons with text */
 }
 
 .accordion-button:not(.collapsed) {
     background-color: #6610f2;
     color: #fff;
+}
+
+.accordion-button .bi {
+    margin-right: 0.5rem; /* Add some spacing between icon and text */
+}
+
+/* Icon and caret when collapsed (closed) */
+.accordion-button.collapsed .bi,
+.accordion-button.collapsed::after {
+    color: #6610f2 !important; /* Purplish color when collapsed */
+}
+
+/* Icon and caret when expanded (open) */
+.accordion-button:not(.collapsed) .bi,
+.accordion-button:not(.collapsed)::after {
+    color: #fff !important; /* White color when expanded */
 }
 
 .accordion-button:focus {

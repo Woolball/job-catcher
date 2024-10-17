@@ -136,4 +136,4 @@ async def fetch_jobs(search_terms, location, radius, interval):
             else:
                 logger.warning(f"Unexpected result type: {type(data)}, skipping this result.")
 
-        return all_jobs_df.drop_duplicates(subset=['title', 'company'])
+        return all_jobs_df

@@ -20,4 +20,4 @@ def fetch_jobs(search_terms, location, radius, interval, retries=3, backoff_fact
             linkedin_fetch_description=True,
         )
         all_jobs_df = pd.concat([all_jobs_df, jobs_df], ignore_index=True)
-    return all_jobs_df.drop_duplicates(subset=['title', 'company'])
+    return all_jobs_df
