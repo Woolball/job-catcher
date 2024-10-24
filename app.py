@@ -4,6 +4,7 @@ import argparse
 from flask import Flask, request, jsonify, render_template, make_response, send_from_directory
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from huggingface_hub import upload_folder
 from werkzeug.exceptions import RequestEntityTooLarge
 from config import Config
 from src.ranking import rank_job_descriptions
@@ -13,7 +14,7 @@ import asyncio
 import gc
 
 # Flask app setup
-app = Flask(__name__)
+app = Flask(__name__, template_folder=Config.TEMPLATE_FOLDER, static_folder=Config.STATIC_FOLDER)
 app.config.from_object(Config)
 
 # Set up rate limiter
@@ -114,7 +115,7 @@ def search_jobs():
         all_jobs_df = process_job_dataframe(all_jobs_df)
         ranked_jobs_df = rank_job_descriptions(all_jobs_df, result['cv_text'], result['keywords'])
         dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
-        ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'combined_score', 'display_company', 'date_posted']].head(Config.RESULTS_WANTED).to_dict(orient='records')
+        ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'display_company', 'date_posted', 'combined_score', 'tier']].head(Config.RESULTS_WANTED).to_dict(orient='records')
 
         del all_jobs_df, ranked_jobs_df # Free DataFrames explicitly after use
         gc.collect() # Force garbage collection

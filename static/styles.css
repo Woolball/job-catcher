@@ -185,8 +185,17 @@ textarea.form-control {
     margin-bottom: 0.5rem;
 }
 
-.job-card small {
-    color: #6c757d;
+.tier-high {
+    color: #28a745; /* Strong green */
+}
+.tier-moderate {
+    color: #007bff; /* Lighter green/blue */
+}
+.tier-low {
+    color: #ff8c00; /* Light yellow/green */
+}
+.tier-irrelevant {
+    color: #6c757d; /* Grey */
 }
 
 .job-card p {

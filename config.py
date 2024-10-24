@@ -9,9 +9,10 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 class Config:
-    UPLOAD_FOLDER = 'uploads/'
-    DATA_FOLDER = 'data/'
-    STATIC_FOLDER = 'static/'
+    TEMPLATE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+    DATA_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    STATIC_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2MB limit
     ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx', 'rtf'}
     ALLOWED_MIME_TYPES = {
@@ -39,6 +40,16 @@ class Config:
 
     REDIS_HOST = os.getenv("REDIS_HOST", "")
     REDIS_PORT = os.getenv("REDIS_PORT", 6379)
+
+    LANG_COVERAGE_SBERT = ('ar, bg, ca, cs, da, de, el, en, es, et, fa, fi, fr, fr, gl, gu, he, hi, hr, hu, hy, id,'
+                           ' it, ja, ka, ko, ku, lt, lv, mk, mn, mr, ms, my, nb, nl, pl, pt, ro, ru, sk, sl, sq,'
+                           ' sr, sv, th, tr, uk, ur, vi, zh').split(', ')
+    LANG_COVERAGE_LANGDETECT = ('af, am, an, ar, as, az, be, bg, bn, br, bs, ca, cs, cy, da, de, dz, el, en, eo, es, et,'
+                                ' eu, fa, fi, fo, fr, ga, gl, gu, he, hi, hr, ht, hu, hy, id, is, it, ja, jv, ka, kk, km,'
+                                ' kn, ko, ku, ky, la, lb, lo, lt, lv, mg, mk, ml, mn, mr, ms, mt, nb, ne, nl, nn, no, oc,'
+                                ' or, pa, pl, ps, pt, qu, ro, ru, rw, se, si, sk, sl, sq, sr, sv, sw, ta, te, th, tl, tr,'
+                                ' ug, uk, ur, vi, vo, wa, xh, zh, zu').split(', ')
+
 
     # Check essential environment variables
     if FETCHER_NAME == "jsearch" and not JSEARCH_API_KEY:

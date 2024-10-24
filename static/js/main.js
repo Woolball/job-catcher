@@ -111,6 +111,22 @@ document.addEventListener('DOMContentLoaded', function() {
         resultsSection.style.display = 'block';
 
         jobs.forEach(job => {
+            // Define color class based on the tier value
+            let tierClass = '';
+            switch (job.tier) {
+                case 'High':
+                    tierClass = 'tier-high'; // Strong green for high
+                    break;
+                case 'Moderate':
+                    tierClass = 'tier-moderate'; // Moderate green for medium
+                    break;
+                case 'Low':
+                    tierClass = 'tier-low'; // Faded green/yellow for low
+                    break;
+                case 'Irrelevant':
+                    tierClass = 'tier-irrelevant'; // Grey for irrelevant
+                    break;
+            }
             const jobCard = `
                 <a href="${job.job_url}" target="_blank" class="list-group-item list-group-item-action job-card">
                     <div class="d-flex justify-content-between align-items-start">
@@ -118,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <small>${job.date_posted}</small>
                     </div>
                     <p class="mb-1">${job.display_company}</p>
-                    <small class="text-muted">Score: ${job.combined_score.toFixed(2)}</small>
+                    <small class="${tierClass}">${job.tier} match</small>
                 </a>
             `;
             jobResults.innerHTML += jobCard;

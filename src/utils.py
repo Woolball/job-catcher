@@ -10,20 +10,49 @@ from werkzeug.utils import secure_filename
 import pdfplumber
 import docx
 import pypandoc
+from langid.langid import LanguageIdentifier, model
+import stopwordsiso
+import math
 import logging
 
 # Initialize logger
 logger = logging.getLogger(__name__)
-
+lang_identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 delimiters = r'[,;.]+'
 
 def preprocess_text(text):
+    """Efficient text preprocessing: convert to lowercase, replace non-alphanumeric chars, reduce spaces."""
     if not text:
         return ''
-    # Replace non-alphanumeric characters with spaces
-    processed_text = ''.join(c if c.isalnum() else ' ' for c in text.lower().replace('\n', ' '))
-    # Reduce consecutive spaces to a single space
-    return re.sub(r'\s+', ' ', processed_text).strip()
+    # Use re.sub to replace non-alphanumeric characters and reduce spaces in one go
+    return re.sub(r'[^a-z0-9]+', ' ', text.lower()).strip()
+
+def detect_language(text):
+    if not text:
+        return None
+    lang, confidence = lang_identifier.classify(text[:500])
+    return lang if confidence >= 0.3 else None
+
+stopwords_cache = {}
+
+def remove_stopwords(text_list, lang_code, fallback_lang='en'):
+    """Remove stopwords from a list of texts based on detected language."""
+    if lang_code not in stopwords_cache:
+        if stopwordsiso.has_lang(lang_code):
+            stopwords_cache[lang_code] = set(stopwordsiso.stopwords(lang_code))
+        elif stopwordsiso.has_lang(fallback_lang):
+            logger.warning(f"Stopwords for '{lang_code}' not found. Using fallback: {fallback_lang}.")
+            stopwords_cache[lang_code] = set(stopwordsiso.stopwords(fallback_lang))
+        else:
+            logger.warning(f"Neither '{lang_code}' nor fallback '{fallback_lang}' have stopword lists.")
+            return text_list
+
+    stopwords = stopwords_cache[lang_code]
+
+    return [
+        ' '.join([word for word in text.split() if word not in stopwords])
+        for text in text_list
+    ]
 
 
 def allowed_file(filename):
@@ -35,19 +64,18 @@ def get_file_mime_type(file_path):
 
 
 def extract_text_from_file(file_path, mime_type):
-    """Extracts text from different file formats based on MIME type and limits it to 2000 words."""
+    """Extracts text from different file formats based on MIME type."""
     try:
-        if mime_type == 'application/pdf':
-            text = extract_text_from_pdf(file_path)
-        elif mime_type in ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']:
-            text = extract_text_from_docx(file_path)
-        elif mime_type == 'application/rtf':
-            text = extract_text_from_rtf(file_path)
-        elif mime_type == 'text/plain':
-            text = extract_text_from_txt(file_path)
-        else:
+        extractors = {
+            'application/pdf': extract_text_from_pdf,
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': extract_text_from_docx,
+            'application/msword': extract_text_from_docx,
+            'application/rtf': extract_text_from_rtf,
+            'text/plain': extract_text_from_txt
+        }
+        if mime_type not in extractors:
             raise ValueError(f"Unsupported file type: {mime_type}")
-        return text
+        return extractors[mime_type](file_path)
     except Exception as e:
         logger.error(f"Error extracting text from file {file_path}: {str(e)}")
         raise ValueError(f"Failed to process file: {file_path}. Error: {str(e)}")
@@ -81,10 +109,8 @@ def validate_and_clean_input(form, files):
     search_terms = [s for s in search_terms if s]
     country = form.get('country', '').strip().split(',')[0]
     region = form.get('region', '').strip().split(',')[0]
-    if region:
-        location = region + ', ' + country
-    else:
-        location = country
+    location = f"{region}, {country}" if region else country
+
     keywords_pure = [preprocess_text(keyword.strip()) for keyword in re.split(delimiters, form.get('keywords', ''))]
     keywords = keywords_pure + search_terms #append to the list of keywords all the search terms
     keywords += [word for phrase in keywords for word in phrase.split()] #append to the list of keywords all individual words
@@ -149,9 +175,7 @@ def dump_ranked_jobs(ranked_jobs_df, file_path):
 
 def process_job_dataframe(jobs_df):
     if not jobs_df.empty:
-        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce')  # Convert to datetime
-        jobs_df['date_posted'] = jobs_df['date_posted'].fillna(datetime.today())
-        jobs_df['date_posted'] = jobs_df['date_posted'].apply(lambda date_value: date_value.strftime('%b %d'))
+        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce').fillna(datetime.today()).dt.strftime('%b %d')
         jobs_df['display_title'] = jobs_df['title'].fillna('').replace('', 'Unknown').str.strip()
         jobs_df['display_company'] = jobs_df['company'].fillna('').replace('', 'Unknown').str.strip().str.title()
         jobs_df['title'] = jobs_df['display_title'].apply(preprocess_text)
@@ -159,8 +183,8 @@ def process_job_dataframe(jobs_df):
         jobs_df['description'] = (jobs_df['title'] + ' ' + jobs_df['description']).str.strip()
         jobs_df['company'] = jobs_df['display_company'].apply(preprocess_text)
         # Drop duplicates based on display titles and 1st word of display company
-        jobs_df['first_word_company'] = jobs_df['display_company'].str.split().str[0]
-        jobs_df = jobs_df.drop_duplicates(subset=['display_title', 'first_word_company'])
+        jobs_df['first_word_company'] = jobs_df['display_company'].str.split().str[0].apply(preprocess_text)
+        jobs_df = jobs_df.drop_duplicates(subset=['title', 'first_word_company'])
         jobs_df = jobs_df.drop(columns=['first_word_company'])
     return jobs_df
 
