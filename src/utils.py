@@ -12,7 +12,6 @@ import docx
 import pypandoc
 from langid.langid import LanguageIdentifier, model
 import stopwordsiso
-import math
 import logging
 
 # Initialize logger

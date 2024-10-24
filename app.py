@@ -4,7 +4,6 @@ import argparse
 from flask import Flask, request, jsonify, render_template, make_response, send_from_directory
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from huggingface_hub import upload_folder
 from werkzeug.exceptions import RequestEntityTooLarge
 from config import Config
 from src.ranking import rank_job_descriptions
