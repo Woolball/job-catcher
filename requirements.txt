@@ -29,5 +29,4 @@ gunicorn~=23.0.0
 Flask-Limiter~=3.8.0
 stopwordsiso~=0.6.1
 langid~=1.1.6
-spacy~=3.7.6
 locust~=2.31.8
