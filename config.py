@@ -50,6 +50,11 @@ class Config:
                                 ' or, pa, pl, ps, pt, qu, ro, ru, rw, se, si, sk, sl, sq, sr, sv, sw, ta, te, th, tl, tr,'
                                 ' ug, uk, ur, vi, vo, wa, xh, zh, zu').split(', ')
 
+    #SEMANTIC_MODEL_NAME = "intfloat/multilingual-e5-small"
+    #SEMANTIC_MODEL_NAME = "shibing624/text2vec-base-multilingual"
+    SEMANTIC_MODEL_NAME = "sentence-transformers/all-MiniLM-L12-v2"
+    #SEMANTIC_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+    #SEMANTIC_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
     # Check essential environment variables
     if FETCHER_NAME == "jsearch" and not JSEARCH_API_KEY:

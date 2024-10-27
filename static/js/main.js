@@ -134,7 +134,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <small>${job.date_posted}</small>
                     </div>
                     <p class="mb-1">${job.display_company}</p>
-                    <small class="${tierClass}">${job.tier} match</small>
+                    <small class="${tierClass}">
+                        ${job.tier}${job.tier !== "Irrelevant" ? " match" : ""}
+                    </small>
                 </a>
             `;
             jobResults.innerHTML += jobCard;

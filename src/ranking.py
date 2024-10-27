@@ -1,6 +1,6 @@
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-from .models import sbert_model, tfidf_vectorizer
+from .models import semantic_model, tfidf_vectorizer
 import pandas as pd
 import logging
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -27,15 +27,12 @@ def calculate_tfidf_scores(cv_text, job_texts):
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
 
 
-def calculate_sbert_scores(cv_text, job_texts):
+def calculate_semantic_scores(cv_text, job_texts):
     """Calculate SBERT similarity scores between a CV and multiple job descriptions."""
     if not cv_text or not job_texts:
         return [0.0] * len(job_texts)
     texts = [cv_text] + job_texts  # Prepare all texts together for batch processing
-    embeddings = sbert_model.encode(texts)  # Batch size can be adjusted
-    cv_embedding = embeddings[0]  # First embedding is for the CV
-    job_embeddings = embeddings[1:]  # The rest are job embeddings
-    return cosine_similarity([cv_embedding], job_embeddings).flatten()  # Calculate similarity
+    return semantic_model.calculate_semantic_scores(cv_text, job_texts)
 
 
 # Extract unique elite keywords based on term frequency and entropy
@@ -72,7 +69,7 @@ def calculate_elite_scores(cv_text, job_texts, top_n=30):
     ]
 
     # Calculate SBERT-based semantic similarity
-    elite_scores = calculate_sbert_scores(reduced_documents[0], reduced_documents[1:])
+    elite_scores = calculate_semantic_scores(reduced_documents[0], reduced_documents[1:])
     return elite_scores
 
 
@@ -86,7 +83,7 @@ def rank_job_descriptions(jobs_df, cv_text, keywords):
     lang = detect_language(cv_text)
     job_descriptions_list_stopremoved = remove_stopwords(job_descriptions_list, lang)
     jobs_df['tfidf_score'] = calculate_tfidf_scores(cv_text, job_descriptions_list_stopremoved)
-    jobs_df['sbert_similarity'] = calculate_sbert_scores(cv_text, job_descriptions_list)
+    jobs_df['sbert_similarity'] = calculate_semantic_scores(cv_text, job_descriptions_list)
     jobs_df['keyword_score'] = calculate_keyword_scores(keywords, job_descriptions_list)
     jobs_df['elite_score'] = calculate_elite_scores(cv_text, job_descriptions_list_stopremoved, 100)
 
@@ -101,10 +98,10 @@ def rank_job_descriptions(jobs_df, cv_text, keywords):
     '''
 
     # Historical score max values
-    tfidf_score_max_historical = 0.12104849876900779
-    sbert_score_max_historical = 0.7
+    tfidf_score_max_historical = 0.12664288035741172
+    sbert_score_max_historical = 0.67
     keyword_score_max_historical = 0.5833333333333334
-    elite_score_max_historical = 0.94124043
+    elite_score_max_historical = 0.8806282
     print('Max scores:', jobs_df['tfidf_score'].max(), jobs_df['sbert_similarity'].max(), jobs_df['keyword_score'].max(), jobs_df['elite_score'].max())
 
     # Calculate max values based on historical and current data
