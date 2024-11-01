@@ -55,7 +55,6 @@ async def enforce_rate_limit():
         try:
             timestamps = redis_client.lrange(REDIS_KEY, 0, -1)
             valid_timestamps = [float(ts.decode()) for ts in timestamps if float(ts.decode()) > current_time - RATE_LIMIT_PERIOD]
-            print(valid_timestamps)
 
             # **Trim the Redis list to only valid timestamps** (those within the RATE_LIMIT_PERIOD)
             redis_client.ltrim(REDIS_KEY, -len(valid_timestamps), -1)

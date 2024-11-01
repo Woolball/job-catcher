@@ -114,13 +114,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // Define color class based on the tier value
             let tierClass = '';
             switch (job.tier) {
-                case 'High':
+                case 'High match':
                     tierClass = 'tier-high'; // Strong green for high
                     break;
-                case 'Moderate':
+                case 'Mid match':
                     tierClass = 'tier-moderate'; // Moderate green for medium
                     break;
-                case 'Low':
+                case 'Tiny maybe':
                     tierClass = 'tier-low'; // Faded green/yellow for low
                     break;
                 case 'Irrelevant':
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <p class="mb-1">${job.display_company}</p>
                     <small class="${tierClass}">
-                        ${job.tier}${job.tier !== "Irrelevant" ? " match" : ""}
+                        ${job.tier}
                     </small>
                 </a>
             `;

@@ -110,12 +110,20 @@ def validate_and_clean_input(form, files):
     region = form.get('region', '').strip().split(',')[0]
     location = f"{region}, {country}" if region else country
 
-    keywords_pure = [preprocess_text(keyword.strip()) for keyword in re.split(delimiters, form.get('keywords', ''))]
-    keywords = keywords_pure + search_terms #append to the list of keywords all the search terms
-    keywords += [word for phrase in keywords for word in phrase.split()] #append to the list of keywords all individual words
-    keywords = list(set(keywords)) #remove duplicates
-    keywords += keywords_pure #duplicate original keywords as they deserve double the weight
-    keywords = [s for s in keywords if s] #remove empty strings
+    preferred_keywords_pure = [preprocess_text(keyword.strip()) for keyword in re.split(delimiters, form.get('preferred_keywords', ''))]
+    preferred_keywords = preferred_keywords_pure + search_terms #append to the list of keywords all the search terms
+    preferred_keywords += [word for phrase in preferred_keywords for word in phrase.split()] #append to the list of keywords all individual words
+    preferred_keywords = list(set(preferred_keywords)) #remove duplicates
+    preferred_keywords += preferred_keywords_pure #duplicate original keywords as they deserve double the weight
+    preferred_keywords = [s for s in preferred_keywords if s] #remove empty strings
+    required_keywords = [preprocess_text(keyword.strip()) for keyword in
+                     re.split(delimiters, form.get('required_keywords', ''))]
+    if required_keywords == ['']:
+        required_keywords = []
+    exclude_keywords = [preprocess_text(keyword.strip()) for keyword in
+                     re.split(delimiters, form.get('exclude_keywords', ''))]
+    if exclude_keywords == ['']:
+        exclude_keywords = []
     interval = form.get('posted_since', 'month')
 
     # Validate that the essential text fields are not empty after preprocessing
@@ -156,15 +164,17 @@ def validate_and_clean_input(form, files):
             if not cv_text:
                 return jsonify({'error': 'CV file is empty or contains invalid content'}), 400
     else:
-        cv_text = ' '.join(keywords)
+        cv_text = ' '.join(preferred_keywords)
 
     # Return cleaned data
     return {
         'search_terms': search_terms,
         'location': location,
         'interval': interval,
-        'keywords': keywords,
-        'cv_text': cv_text
+        'cv_text': cv_text,
+        'preferred_keywords': preferred_keywords,
+        'required_keywords': required_keywords,
+        'exclude_keywords': exclude_keywords
     }
 
 

@@ -3,13 +3,17 @@
 </div>
 <h1>Job Catcher</h1>
 
-Job Catcher is a web application that allows users to rank job postings based on their CV text, using semantic and keyword matching. The application combines different approaches (SBERT, TF-IDF, and keyword scoring) to analyze job descriptions and match them with user profiles effectively.
+Job Catcher is a web application that allows users to rank job postings based on their CV text. It is ultimately a retrieval and reranking pipeline. It first retrieves a pool of job postings, then ranks the results by combining several semantic and classical approaches to for an optimal match with the user profile.
 
 **See the live website: https://job-catcher.onrender.com/**
 
 ## Features
-- **Job Aggregator**: Fetches jobs from LinkedIn, Glassdoor, and Indeed.
-- **Advanced Matching**: Combines semantic similarity and keyword matching to rank job postings based on relevance to the user's CV.
+- **Job Aggregator**: Uses Google’s job search API to gather listings from major job boards like LinkedIn, Glassdoor, Indeed, ZipRecruiter, Monster, and more, as well as from company career pages.
+- **Advanced Matching**: Reranks the results using several techniques to optimize the match with the user profiel:
+  - Semantic similarity with sentence-transformers.
+  - Semantic elite keyword matching.
+  - TF-IDF scoring.
+  - Keyword scoring.
 - **Web Interface**: Access via a simple web interface, with the local server running on the user's side.
 
 ## Installation
@@ -89,14 +93,14 @@ Job Catcher is a web application that allows users to rank job postings based on
 You can provide input directly in the web interface:
 - **Search terms:** Enter comma-separated job titles (e.g., "product manager, financial advisor").
 - **CV:** Upload your CV file for semantic comparison.
-- **Skill-matching keywords:** Provide specific skills or keywords you want to match in job descriptions (e.g., "data analysis, project management").
+- **Preferred and exclusion keywords:** Provide keywords you'd like to include or exclude from your results (e.g., "data analysis, project management, remote, senior").
 
 ### Viewing Results
-After submitting the form, the application will display a ranked list of job postings based on their relevance to your CV. Each job listing includes the job title, company name, date posted, and a score indicating its relevance.
+After submitting the form, the application will display a ranked list of job postings based on their relevance to your CV. Each job listing includes the job title, company name, date posted, and a tag indicating its level of relevance.
 
 **Note:**
-- A maximum of 50 results are displayed in the interface. The full results, including detailed scores, are saved to a CSV file located in the `data/` directory.
-- The scores are normalized based on the job postings returned in the search.
+- A maximum of 50 results are displayed by default in the interface. This can be configured in `/config.py`.
+- After each search, the full results, including detailed scores, are saved to a CSV file located in the `data/` directory.
 
 ## Project Structure
 ```
@@ -105,8 +109,7 @@ After submitting the form, the application will display a ranked list of job pos
 ├── src/
 │   ├── fetchers
 │   │   ├── scraper.py
-│   │   └──  scraper.py
-│   ├── models.py
+│   │   └── jsearch.py
 │   ├── ranking.py
 │   └── utils.py
 ├── static/
@@ -118,7 +121,7 @@ After submitting the form, the application will display a ranked list of job pos
 ├── templates/
 │   └──  index.html
 ├── data/
-│   └── dump_search_scraper.csv (created at runtime)
+│   └── dump_search.csv (created at runtime)
 ├── uploads/ (created at runtime)
 ├── README.md
 ├── requirements.txt
@@ -127,9 +130,9 @@ After submitting the form, the application will display a ranked list of job pos
 ```
 ## Configuration
 
-- **App Parameters:** Modify default the app's parameters in `src/config.py` and in your `/.env` file. Notably, you can select which of the two fetchers to use for retrieving job ads. You can also implement your own fetcher with other scrapers or API. Follow the code conventions in `src/fetchers/scraper.py`.
+- **App Parameters:** Modify the default parameters in `/config.py` and in your `/.env` file. Notably, you can select which of the two fetchers to use for retrieving job ads. You can also implement your own fetcher with other scrapers or API. Follow the code conventions in `src/fetchers/scraper.py`.
 - **Results Storage:** By default, results of the latest search are stored in a CSV file under the `data/` directory (refreshed after each search).
-- **Customizing Matching Logic:** You are welcome to modify or replace the job-matching logic implemented in `src/models.py` and `src/ranking.py` to experiment with different matching strategies.
+- **Customizing Matching Logic:** You are welcome to modify or replace the job-matching logic implemented in `src/ranking.py` to experiment with different matching strategies.
 
 ## Contributing
 
@@ -145,4 +148,6 @@ For commercial use or licensing inquiries, please contact [ammar.halabi@gmail.co
 
 ## Acknowledgements
 
-This project uses the [JobSpy](https://github.com/Bunsly/JobSpy) package for job scraping. Also, sentence-transformers provides the core semantic-matching mechanism. Particularly, the mini models (e.g., [all-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L12-v2)) provide a great balance between performance and efficiency.
+- This project uses the [**JobSpy**](https://github.com/Bunsly/JobSpy) package for job scraping.
+- **SentenceTransformers** provides the core semantic-matching mechanism. Particularly, the mini models (e.g., [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)) provides a great balance between performance and efficiency.
+- **The Elite Keyword Matching** mechanism is inspired by: Susan, S., Sharma, M., & Choudhary, G. ([2024](https://doi.org/10.4114/intartif.vol27iss74pp117-132)). Uniqueness meets Semantics: A Novel Semantically Meaningful Bag-of-Words Approach for Matching Resumes to Job Profiles. Inteligencia Artificial, 27(74), 117–132.

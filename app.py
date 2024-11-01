@@ -112,7 +112,7 @@ def search_jobs():
             }), 200  # Return a 200 status code with an empty job list and a message.
 
         all_jobs_df = process_job_dataframe(all_jobs_df)
-        ranked_jobs_df = rank_job_descriptions(all_jobs_df, result['cv_text'], result['keywords'])
+        ranked_jobs_df = rank_job_descriptions(all_jobs_df, result['cv_text'], result['preferred_keywords'], result['required_keywords'], result['exclude_keywords'])
         dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
         ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'display_company', 'date_posted', 'combined_score', 'tier']].head(Config.RESULTS_WANTED).to_dict(orient='records')
 

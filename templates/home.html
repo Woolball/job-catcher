@@ -22,7 +22,7 @@
 
         <header class="navbar navbar-expand-lg navbar-light bg-transparent fixed-top">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="#">
+                <a class="navbar-brand d-flex align-items-center" href="#hero">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-briefcase me-2" viewBox="0 0 1000 1000" transform="scale(1, -1)">
                             <path d="M470 914 c-58 -33 -93 -67 -137 -132 -47 -71 -75 -155 -75 -223 l0 -56 -54 -17 c-71 -22 -134 -71 -161 -126 -29 -56 -29 -78 0 -121 35 -52 108 -77 254 -85 l121 -7 -15 -34 c-34 -83 27 -107 117 -47 57 39 176 163 196 205 11 22 26 39 36 39 24 0 78 48 78 70 0 9 34 50 75 89 45 43 75 79 75 91 0 20 -1 20 -32 4 -18 -9 -57 -39 -85 -67 -50 -48 -76 -58 -34 -13 42 45 100 194 85 218 -3 4 -13 8 -23 8 -14 0 -20 -11 -25 -42 -9 -55 -62 -152 -100 -185 l-31 -26 -6 149 c-8 179 -25 242 -79 296 -33 34 -43 38 -86 38 -34 0 -63 -8 -94 -26z m138 -30 c54 -37 75 -135 74 -344 -1 -134 -3 -156 -18 -165 -9 -5 -31 -20 -50 -32 l-33 -22 -132 95 c-73 52 -137 100 -141 107 -13 20 -9 62 10 125 52 165 209 293 290 236z m-232 -472 c130 -91 164 -116 164 -123 0 -3 -21 -26 -46 -49 l-46 -42 -132 5 c-141 5 -190 15 -224 47 -41 39 -20 111 43 150 46 28 124 59 151 60 11 0 52 -22 90 -48z m399 -22 c0 -18 -6 -26 -21 -28 -23 -3 -37 18 -27 44 10 25 48 13 48 -16z m-85 -68 c0 -50 -222 -264 -247 -238 -14 14 98 148 169 201 59 44 78 53 78 37z"/>
                             <path d="M412 634 c6 -76 29 -124 91 -185 48 -47 50 -48 64 -29 12 18 10 23 -27 57 -53 47 -80 100 -80 158 0 25 -4 45 -9 45 -5 0 -17 3 -26 7 -16 5 -17 0 -13 -53z"/>
@@ -52,8 +52,7 @@
         </header>
 
         <main>
-
-            <section class="bg-gradient-purple text-white py-5 hero-section">
+            <section class="bg-gradient-purple text-white py-5 hero-section" id="hero">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-6 mb-5 mb-lg-0">
@@ -131,13 +130,17 @@
                                             <label for="cv_file">Upload CV</label>
                                         </div>
 
-                                        <h5 class="mb-2">Any keywords to emphasize?</h5>
-                                        <p class="text-muted small mb-3">What makes you unique, or you wish to find</p>
+                                        <h5 class="mb-2">Preferred keywords</h5>
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Skill-Matching Terms">
-                                            <label for="keywords">E.g., social research, senior manager</label>
+                                            <input type="text" class="form-control" id="preferred_keywords" name="preferred_keywords" placeholder="Skill-Matching Terms">
+                                            <label for="preferred_keywords">E.g., social research, senior manager</label>
                                         </div>
 
+                                        <h5 class="mb-2">Exclude keywords</h5>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="exclude_keywords" name="exclude_keywords" placeholder="Skill-Matching Terms">
+                                            <label for="exclude_keywords">E.g., Junior, internship</label>
+                                        </div>
 
                                         <button type="submit" class="btn btn-primary w-100" id="searchButton">
                                             <span id="searchButtonText">Search Jobs</span>
@@ -160,21 +163,21 @@
                     <h2 class="text-center mb-4">How it works</h2>
                     <div class="row justify-content-center">
                         <div class="col-md-8">
-                            <p class="lead text-center mb-5">Job search online is time-consuming, stressful, and full of irrelevant results. With Job Catcher I want to save time by focusing on highly relevant job matches. Here's how:</p>
+                            <p class="lead text-center mb-5">Job search is <a href="https://medium.com/p/1624d5f8a608" target="_blank">time-consuming and stressful</a>. With Job Catcher I want to save time by focusing on highly relevant job matches. Here's how:</p>
                             <div class="row">
                                 <div class="col-md-6 mb-4">
                                     <div class="d-flex align-items-center mb-3">
                                         <i class="bi bi-search fs-2 text-primary me-3"></i>
                                         <h4 class="mb-0">Job Ad Retrieval</h4>
                                     </div>
-                                    <p>Collect job ads from various joba boards and platforms, using the <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch">JSearch API</a>.</p>
+                                    <p>Collect ads from various platforms, using Google's job search API.</p>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="d-flex align-items-center mb-3">
                                         <i class="bi bi-diagram-3 fs-2 text-primary me-3"></i>
                                         <h4 class="mb-0">Semantic Matching</h4>
                                     </div>
-                                    <p>Analyze the meaning of your CV and match with job ads, using an <a href="https://www.sbert.net/">SBERT</a> LLM.</p>
+                                    <p>Match your CV with job ads, using an <a href="https://www.sbert.net/" target="_blank">SBERT model</a>, and inspired by <a href="https://doi.org/10.4114/intartif.vol27iss74pp117-132" target="_blank">Susan et al. 2024</a>.</p>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="d-flex align-items-center mb-3">
@@ -249,15 +252,15 @@
                             <img src="static/avatar.png" alt="Avatar" class="avatar-img">
                             <div class="bio-text">
                                 <p class="lead">
-                                    My name is Ammar Halabi. I'm a human-centered researcher, designer and strategist.
-                                    I also experiment with programming and ML.
+                                    My name is <a href="https://www.linkedin.com/in/ammarhalabi/">Ammar Halabi</a>. I'm a human-centered researcher, designer and strategist.
+                                    I experiment with programming and ML, and I'm interested in shortening the distance from design to code.
                                 </p>
                                 <p class="lead">
                                     I created Job Catcher to save on time and stress as I browsed through loads of irrelevant job ads.
                                     It is also an opportunity to experience the full product lifecycle, from research and design to development and deployment.
                                 </p>
                                 <p class="lead">
-                                    With a background in Computer Science, AI, HCI, and Sociology, I create tech that's humane and impactful. Feel free to <a href="https://www.linkedin.com/in/ammarhalabi/">reach out!</a>
+                                    With a background in Computer Science, AI, HCI, and Sociology, I create tech that's humane and impactful.
                                 </p>
                             </div>
                         </div>
@@ -289,7 +292,7 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingSearchTips">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSearchTips" aria-expanded="true" aria-controls="collapseSearchTips">
-                                        <i class="bi bi-search fs-3 me-2 text-primary"></i>How to get the best search results?
+                                        <i class="bi bi-search fs-3 me-2 text-primary"></i>How to get the best results?
                                     </button>
                                 </h2>
                                 <div id="collapseSearchTips" class="accordion-collapse collapse show" aria-labelledby="headingSearchTips" data-bs-parent="#faqAccordion">
@@ -304,6 +307,20 @@
                                 </div>
                             </div>
 
+                            <!-- Sources -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingSources">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSources" aria-expanded="false" aria-controls="collapseSources">
+                                        <i class="bi bi-globe fs-3 me-2 text-primary"></i>Where do the results come from?
+                                    </button>
+                                </h2>
+                                <div id="collapseSources" class="accordion-collapse collapse" aria-labelledby="headingSources" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <p>Job Catcher uses Google’s job search API to gather listings from major job boards like LinkedIn, Glassdoor, Indeed, ZipRecruiter, Monster, and more, as well as from company career pages. Most job ads are available on Job Catcher the same day they’re posted online.</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Multilingual Support -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingMultilingual">
@@ -314,7 +331,7 @@
                                 <div id="collapseMultilingual" class="accordion-collapse collapse" aria-labelledby="headingMultilingual" data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
                                         <p>Yes, Job Catcher allows you to search for jobs and upload your CV in any language. The jobs matched highest will be in the same language of your CV.</p>
-                                        <p>While the semantic matching is optimized for English, the other matching mechanisms will robustly cover the gap in most cases.</p>
+                                        <p>While the semantic matching is optimized for English, the other mechanisms will robustly cover the gap in most cases.</p>
                                     </div>
                                 </div>
                             </div>
@@ -323,7 +340,7 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingPrivacyTerms">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePrivacyTerms" aria-expanded="false" aria-controls="collapsePrivacyTerms">
-                                        <i class="bi bi-shield-lock fs-3 me-2 text-primary"></i>What about privacy and terms of service?
+                                        <i class="bi bi-shield-lock fs-3 me-2 text-primary"></i>Privacy & terms of service
                                     </button>
                                 </h2>
                                 <div id="collapsePrivacyTerms" class="accordion-collapse collapse" aria-labelledby="headingPrivacyTerms" data-bs-parent="#faqAccordion">
