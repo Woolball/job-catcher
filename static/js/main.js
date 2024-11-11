@@ -110,6 +110,9 @@ document.addEventListener('DOMContentLoaded', function() {
         jobSearchForm.style.display = 'none';
         resultsSection.style.display = 'block';
 
+        // Push state to browser history for results view
+        history.pushState({ showResults: true }, '', '#results')
+
         jobs.forEach(job => {
             // Define color class based on the tier value
             let tierClass = '';
@@ -142,6 +145,17 @@ document.addEventListener('DOMContentLoaded', function() {
             jobResults.innerHTML += jobCard;
         });
     }
+
+    window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.showResults) {
+            jobSearchForm.style.display = 'none';
+            resultsSection.style.display = 'block';
+        } else {
+            jobSearchForm.style.display = 'block';
+            resultsSection.style.display = 'none';
+        }
+    });
+
 
     // New Search Button
     newSearchButton.addEventListener('click', function() {

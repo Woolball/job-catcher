@@ -1,5 +1,5 @@
 import os
-import re
+import regex as re
 import magic
 from flask import jsonify
 from config import Config
@@ -23,8 +23,8 @@ def preprocess_text(text):
     """Efficient text preprocessing: convert to lowercase, replace non-alphanumeric chars, reduce spaces."""
     if not text:
         return ''
-    # Use re.sub to replace non-alphanumeric characters and reduce spaces in one go
-    return re.sub(r'[^a-z0-9]+', ' ', text.lower()).strip()
+    # Use Unicode properties to keep letters (any language) and numbers, replacing other chars
+    return re.sub(r'[^\p{L}\p{N}]+', ' ', text.lower()).strip()
 
 def detect_language(text):
     if not text:
