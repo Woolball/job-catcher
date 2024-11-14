@@ -209,6 +209,20 @@ textarea.form-control {
     padding: 4px;
 }
 
+.job-card .btn {
+    border: none; /* Remove border */
+    box-shadow: none; /* Remove button shadow */
+    padding: 0; /* Optional: Reduce padding for cleaner look */
+    text-decoration: underline; /* Optional: Makes it look more like a link */
+    color: #007bff; /* Bootstrap's primary link color */
+}
+
+.job-card .btn:hover {
+    text-decoration: none; /* Optional: Removes underline on hover */
+    color: #ffffff; /* White text on hover */
+
+}
+
 footer {
     border-top: 1px solid #e9ecef;
     padding: 16px 0;

@@ -113,6 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Push state to browser history for results view
         history.pushState({ showResults: true }, '', '#results')
 
+        const faviconCache = new Map(); // Cache favicons for reuse
+
         jobs.forEach(job => {
             // Define color class based on the tier value
             let tierClass = '';
@@ -130,17 +132,46 @@ document.addEventListener('DOMContentLoaded', function() {
                     tierClass = 'tier-irrelevant'; // Grey for irrelevant
                     break;
             }
+
+            const linkItems = job.links.map(link => {
+                const baseDomain = new URL(link.url).hostname.replace(/^www\./, '');
+
+                // Check if the favicon is already cached
+                let faviconHTML = faviconCache.get(baseDomain);
+
+                if (!faviconHTML) {
+                    // If not cached, generate and cache the favicon HTML
+                    const faviconURL = `https://icons.duckduckgo.com/ip3/${baseDomain}.ico`;
+                    faviconHTML = `<img src="${faviconURL}" alt="${link.label}" class="favicon me-1" width="16" height="16" onerror="this.style.display='none'">`;
+                    faviconCache.set(baseDomain, faviconHTML);
+                }
+
+                return `
+                    <li class="list-inline-item">
+                        <a href="${link.url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            ${faviconHTML} ${link.label}
+                        </a>
+                    </li>
+                `;
+            }).join('');
+
+
             const jobCard = `
-                <a href="${job.job_url}" target="_blank" class="list-group-item list-group-item-action job-card">
+                <div class="list-group-item job-card">
                     <div class="d-flex justify-content-between align-items-start">
                         <h5 class="mb-1">${job.display_title}</h5>
                         <small>${job.date_posted}</small>
                     </div>
-                    <p class="mb-1">${job.display_company}</p>
-                    <small class="${tierClass}">
-                        ${job.tier}
-                    </small>
-                </a>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="mb-1">${job.display_company}</p>
+                        <small class="${tierClass}">${job.tier}</small>
+                    </div>
+                    <div class="mt-2">
+                        <ul class="list-inline mb-0">
+                            ${linkItems}
+                        </ul>
+                    </div>
+                </div>
             `;
             jobResults.innerHTML += jobCard;
         });

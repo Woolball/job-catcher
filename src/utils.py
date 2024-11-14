@@ -1,5 +1,6 @@
 import os
 import regex as re
+from urllib.parse import urlparse
 import magic
 from flask import jsonify
 from config import Config
@@ -182,6 +183,26 @@ def dump_ranked_jobs(ranked_jobs_df, file_path):
     ranked_jobs_df.to_csv(file_path, quoting=csv.QUOTE_NONNUMERIC, escapechar="\\", index=False)
 
 
+def extract_domain(url):
+    """Extracts the domain name from a URL."""
+    parsed_url = urlparse(url)
+    domain = parsed_url.netloc.split('.')[-2]  # Get the domain name
+    return domain.capitalize()
+
+
+def clean_url(url):
+    """Removes query parameters and unnecessary subdomains from the URL."""
+    parsed_url = urlparse(url)
+    # Check if the domain is LinkedIn and remove subdomains like 'ch.'
+    if 'linkedin' in parsed_url.netloc:
+        netloc_parts = parsed_url.netloc.split('.')
+        if len(netloc_parts) > 2:  # Remove subdomain if it exists
+            netloc = '.'.join(netloc_parts[-2:])  # Keep only the main domain and TLD
+            return f"{parsed_url.scheme}://{netloc}{parsed_url.path}"
+    # For other URLs, simply remove query parameters
+    return url.split('?')[0]
+
+
 def process_job_dataframe(jobs_df):
     if not jobs_df.empty:
         jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce').fillna(datetime.today()).dt.strftime('%b %d')
@@ -195,6 +216,13 @@ def process_job_dataframe(jobs_df):
         jobs_df['first_word_company'] = jobs_df['display_company'].str.split().str[0].apply(preprocess_text)
         jobs_df = jobs_df.drop_duplicates(subset=['title', 'first_word_company'])
         jobs_df = jobs_df.drop(columns=['first_word_company'])
+        jobs_df['links'] = jobs_df['apply_options'].apply(lambda options: [
+            {
+                'label': extract_domain(option['apply_link']),
+                'url': clean_url(option['apply_link'])
+            }
+            for option in options
+        ] if isinstance(options, list) else [])
     return jobs_df
 
 

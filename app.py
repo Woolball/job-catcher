@@ -69,7 +69,7 @@ def add_security_headers(response):
         "default-src 'self'; "  # Only allow resources from the same origin
         "script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com 'unsafe-inline'; "  # Allow scripts from jsdelivr.net and code.jquery.com
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "  # Allow inline styles and from jsdelivr.net
-        "img-src 'self' data:; "  # Allow images from self and data URIs
+        "img-src 'self' data: data: https://icons.duckduckgo.com;"  # Allow images from self, data URIs, and google
         "font-src 'self' https://cdn.jsdelivr.net; "  # Allow fonts from jsdelivr.net
         "connect-src 'self' https://ipapi.co; "  # Allow API calls to ipapi.co
         "object-src 'none'; "  # Disallow object and embed elements
@@ -114,7 +114,7 @@ def search_jobs():
         all_jobs_df = process_job_dataframe(all_jobs_df)
         ranked_jobs_df = rank_job_descriptions(all_jobs_df, result['cv_text'], result['preferred_keywords'], result['required_keywords'], result['exclude_keywords'])
         dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
-        ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'display_company', 'date_posted', 'combined_score', 'tier']].head(Config.RESULTS_WANTED).to_dict(orient='records')
+        ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'display_company', 'date_posted', 'combined_score', 'tier', 'links']].head(Config.RESULTS_WANTED).to_dict(orient='records')
 
         del all_jobs_df, ranked_jobs_df # Free DataFrames explicitly after use
         gc.collect() # Force garbage collection
