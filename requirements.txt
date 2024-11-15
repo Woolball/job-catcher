@@ -30,3 +30,5 @@ Flask-Limiter~=3.8.0
 stopwordsiso~=0.6.1
 langid~=1.1.6
 locust~=2.31.8
+regex~=2024.9.11
+RapidFuzz~=3.10.1
