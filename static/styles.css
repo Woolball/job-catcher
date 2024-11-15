@@ -2,6 +2,10 @@
     background: linear-gradient(to right, #6f42c1, #6610f2);
 }
 
+#hero-left {
+    padding-right: calc(var(--bs-gutter-x) * 3);
+}
+
 .hero-section {
     min-height: 100vh;
     display: flex;
@@ -23,6 +27,7 @@
     border-radius: 20px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-bottom: 1.5rem !important;
 }
 
 .mb-5 {
@@ -252,6 +257,9 @@ footer a:hover {
 
 /* Fix nav menu background and text color */
 @media (max-width: 991.98px) {
+    #hero-left {
+        padding-right: 1rem; /* Removes the value and reverts to parent or default */
+    }
     .navbar-collapse {
         background-color: white; /* Set background color to white on mobile */
         box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow */

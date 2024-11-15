@@ -14,6 +14,9 @@ import pypandoc
 from langid.langid import LanguageIdentifier, model
 import stopwordsiso
 import logging
+from rapidfuzz import process as rf_process
+from rapidfuzz.fuzz import ratio
+
 
 # Initialize logger
 logger = logging.getLogger(__name__)
@@ -205,17 +208,77 @@ def clean_url(url):
 
 def process_job_dataframe(jobs_df):
     if not jobs_df.empty:
-        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce').fillna(datetime.today()).dt.strftime('%b %d')
+        jobs_df = jobs_df[~jobs_df['job_publisher'].fillna('').isin(Config.EXCLUDED_JOB_PUBLISHERS)].reset_index(drop=True)
+        # Format date and preprocess columns
+        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce').fillna(
+            datetime.today()).dt.strftime('%b %d')
         jobs_df['display_title'] = jobs_df['title'].fillna('').replace('', 'Unknown').str.strip()
         jobs_df['display_company'] = jobs_df['company'].fillna('').replace('', 'Unknown').str.strip().str.title()
         jobs_df['title'] = jobs_df['display_title'].apply(preprocess_text)
         jobs_df['description'] = jobs_df['description'].fillna('').apply(preprocess_text)
         jobs_df['description'] = (jobs_df['title'] + ' ' + jobs_df['description']).str.strip()
         jobs_df['company'] = jobs_df['display_company'].apply(preprocess_text)
-        # Drop duplicates based on display titles and 1st word of display company
+
+        # Add first word of company for fuzzy matching
         jobs_df['first_word_company'] = jobs_df['display_company'].str.split().str[0].apply(preprocess_text)
-        jobs_df = jobs_df.drop_duplicates(subset=['title', 'first_word_company'])
-        jobs_df = jobs_df.drop(columns=['first_word_company'])
+
+        # Precompute fuzzy matches for title and first_word_company
+        jobs_df['merge_key'] = jobs_df['title'] + ' ' + jobs_df['first_word_company']
+        merge_groups = {}
+        visited_indices = set()
+
+        for idx, row in jobs_df.iterrows():
+            if idx in visited_indices:
+                continue
+
+            # Find close matches using rapidfuzz
+            matches = rf_process.extract(
+                row['merge_key'],
+                jobs_df['merge_key'].tolist(),
+                scorer=ratio,
+                score_cutoff=85
+            )
+
+            # Collect indices of matching rows
+            matched_indices = [match[2] for match in matches if match[2] != idx]
+            visited_indices.update(matched_indices)
+
+            # Add current index to group
+            group_indices = [idx] + matched_indices
+            merge_groups[idx] = group_indices
+
+        # Consolidate rows based on merge groups
+        consolidated_rows = []
+        seen_indices = set()
+        for group_idx, indices in merge_groups.items():
+            if any(idx in seen_indices for idx in indices):
+                continue
+
+            # Mark all indices in the group as seen
+            seen_indices.update(indices)
+
+            # Combine apply options from all group members
+            combined_apply_options = []
+            for idx in indices:
+                options = jobs_df.loc[idx, 'apply_options']
+                if isinstance(options, list):
+                    combined_apply_options.extend(options)
+
+            # Remove duplicate apply options by apply_link
+            combined_apply_options = list({option['apply_link']: option for option in combined_apply_options}.values())
+
+            # Consolidate row (keep the first row as base)
+            base_row = jobs_df.loc[group_idx].copy()
+            base_row['apply_options'] = combined_apply_options
+            consolidated_rows.append(base_row)
+
+        # Create new DataFrame from consolidated rows
+        jobs_df = pd.DataFrame(consolidated_rows)
+
+        # Drop the temporary columns
+        jobs_df = jobs_df.drop(columns=['first_word_company', 'merge_key'], errors='ignore')
+
+        # Generate the links column
         jobs_df['links'] = jobs_df['apply_options'].apply(lambda options: [
             {
                 'label': extract_domain(option['apply_link']),
@@ -223,7 +286,12 @@ def process_job_dataframe(jobs_df):
             }
             for option in options
         ] if isinstance(options, list) else [])
+
+        # Drop intermediate columns
+        jobs_df = jobs_df.drop(columns=['first_word_company', 'merge_key'], errors='ignore')
+
     return jobs_df
+
 
 
 
