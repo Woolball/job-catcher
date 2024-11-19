@@ -112,7 +112,7 @@ def validate_and_clean_input(form, files):
     search_terms = [s for s in search_terms if s]
     country = form.get('country', '').strip().split(',')[0]
     region = form.get('region', '').strip().split(',')[0]
-    location = f"{region}, {country}" if region else country
+    #location = f"{region}, {country}" if region else country
 
     preferred_keywords_pure = [preprocess_text(keyword.strip()) for keyword in re.split(delimiters, form.get('preferred_keywords', ''))]
     preferred_keywords = preferred_keywords_pure + search_terms #append to the list of keywords all the search terms
@@ -173,7 +173,9 @@ def validate_and_clean_input(form, files):
     # Return cleaned data
     return {
         'search_terms': search_terms,
-        'location': location,
+        'country': country,
+        'region': region,
+        #'location': location,
         'interval': interval,
         'cv_text': cv_text,
         'preferred_keywords': preferred_keywords,
@@ -208,7 +210,10 @@ def clean_url(url):
 
 def process_job_dataframe(jobs_df):
     if not jobs_df.empty:
-        jobs_df = jobs_df[~jobs_df['job_publisher'].fillna('').isin(Config.EXCLUDED_JOB_PUBLISHERS)].reset_index(drop=True)
+        #Exclude low-quality job publishers. This is done despite that these may be passed to the search api as that filtering is seldom effective
+        jobs_df = jobs_df[
+            ~jobs_df['job_publisher'].fillna('').str.contains('|'.join(Config.EXCLUDED_JOB_PUBLISHERS), case=False,
+                                                              na=False)].reset_index(drop=True)
         # Format date and preprocess columns
         jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce').fillna(
             datetime.today()).dt.strftime('%b %d')

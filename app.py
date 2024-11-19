@@ -90,11 +90,15 @@ def index():
 @limiter.limit("10 per minute")
 def search_jobs():
     """Handle job search requests by dynamically selecting the fetcher (scraper or JSearch)."""
-    result = validate_and_clean_input(request.form, request.files)
-    if isinstance(result, tuple) and result[1] == 400:
-        return result
+    form_input = validate_and_clean_input(request.form, request.files)
+    if isinstance(form_input, tuple) and form_input[1] == 400:
+        return form_input
 
-    logger.info(f"Incoming request. Terms: {result['search_terms']} - Location: {result['location']} - Posted since: {result['interval']}")
+    country = form_input['country']
+    region = form_input['region']
+    location = region if region else country
+
+    logger.info(f"Incoming request. Terms: {form_input['search_terms']} - Location: {location} - Posted since: {form_input['interval']}")
     honeypot = request.form.get('jamesbond')
     if honeypot:  # Bots will fill this, humans won't
         logger.warning("Bot detected!")
@@ -102,7 +106,7 @@ def search_jobs():
 
     try:
         # Use the dynamically selected job fetching function
-        all_jobs_df = asyncio.run(job_fetching_function(result['search_terms'], result['location'], Config.DEFAULT_RADIUS, result['interval']))
+        all_jobs_df = asyncio.run(job_fetching_function(form_input['search_terms'], location, country, Config.DEFAULT_RADIUS, form_input['interval']))
 
         # Check if the DataFrame is empty (i.e., no jobs found)
         if all_jobs_df.empty:
@@ -112,7 +116,7 @@ def search_jobs():
             }), 200  # Return a 200 status code with an empty job list and a message.
 
         all_jobs_df = process_job_dataframe(all_jobs_df)
-        ranked_jobs_df = rank_job_descriptions(all_jobs_df, result['cv_text'], result['preferred_keywords'], result['required_keywords'], result['exclude_keywords'])
+        ranked_jobs_df = rank_job_descriptions(all_jobs_df, form_input['cv_text'], form_input['preferred_keywords'], form_input['required_keywords'], form_input['exclude_keywords'])
         dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
         ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'display_company', 'date_posted', 'combined_score', 'tier', 'links']].head(Config.RESULTS_WANTED).to_dict(orient='records')
 

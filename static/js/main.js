@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
-            locationInput.value = data.country_name;
+            locationInput.value = data.country;
 
             // Trigger change event after setting the country value
             const event = new Event('change');

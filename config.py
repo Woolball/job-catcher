@@ -24,11 +24,12 @@ class Config:
     }
     CV_TEXT_LIMIT = 2000 #limit cv text to first 2000 words
     RESULTS_WANTED = 50
+    NUM_SEARCH_PAGES = 2
     DUMP_FILE_NAME = 'data/dump_search.csv'
     DEFAULT_RADIUS = 50
     INTERVAL_MAPPING = {'month': 30, 'week': 7, '3days': 3, 'today': 1}
-    #EXCLUDED_JOB_PUBLISHERS = ['BeBee', 'Learn4Good', 'Joinrs']
-    EXCLUDED_JOB_PUBLISHERS = []
+    EXCLUDED_JOB_PUBLISHERS = ['Trabajo', 'BeBee', 'Learn4Good', 'Joinrs']
+    #EXCLUDED_JOB_PUBLISHERS = []
 
     FETCHER_NAME = os.getenv('FETCHER', 'scraper').lower()
 

@@ -75,16 +75,19 @@ async def enforce_rate_limit():
 
 
 # Fetch jobs for a single search term, with retry, backoff, and rate limit enforcement combined
-async def fetch_jobs_for_search_term(session, search_term, location, radius, interval, retries=3, backoff_factor=0.5):
+async def fetch_jobs_for_search_term(session, search_term, location, country, radius, interval, retries=3, backoff_factor=0.5):
     """
     Fetch jobs for a single search term from JSearch API, with retry and rate limiting.
     """
     querystring = {
         "query": f"{search_term} in {location}",
+        "country": country,
         "date_posted": interval,
-        "exclude_job_publishers": Config.EXCLUDED_JOB_PUBLISHERS,
+        "num_pages" : Config.NUM_SEARCH_PAGES,
+        "exclude_job_publishers": " ".join(Config.EXCLUDED_JOB_PUBLISHERS),
         "radius": radius
     }
+    print(querystring)
 
     for attempt in range(retries):
         await enforce_rate_limit()  # Ensure rate limit is respected before every attempt
@@ -110,7 +113,7 @@ async def fetch_jobs_for_search_term(session, search_term, location, radius, int
 
 
 # Fetch jobs concurrently for multiple search terms
-async def fetch_jobs(search_terms, location, radius, interval):
+async def fetch_jobs(search_terms, location, country, radius, interval):
     """
     Fetch jobs concurrently for multiple search terms, handling retries, rate limits, and errors.
     """
@@ -118,7 +121,7 @@ async def fetch_jobs(search_terms, location, radius, interval):
         raise ValueError("JSearch API key is missing. Please set JSEARCH_API_KEY in the environment.")
 
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_jobs_for_search_term(session, term, location, radius, interval) for term in search_terms]
+        tasks = [fetch_jobs_for_search_term(session, term, location, country, radius, interval) for term in search_terms]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Process results
