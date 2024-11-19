@@ -198,6 +198,12 @@ def extract_domain(url):
 def clean_url(url):
     """Removes query parameters and unnecessary subdomains from the URL."""
     parsed_url = urlparse(url)
+    # Handle Indeed and Talent sites, preserving the first query parameter
+    if 'indeed' in parsed_url.netloc or 'talent' in parsed_url.netloc:
+        query_params = parsed_url.query.split('&')
+        first_param = query_params[0] if query_params else ''
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+        return f"{base_url}?{first_param}" if first_param else base_url
     # Check if the domain is LinkedIn and remove subdomains like 'ch.'
     if 'linkedin' in parsed_url.netloc:
         netloc_parts = parsed_url.netloc.split('.')
