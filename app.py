@@ -94,11 +94,12 @@ def search_jobs():
     if isinstance(form_input, tuple) and form_input[1] == 400:
         return form_input
 
+    search_terms = form_input['search_terms']
     country = form_input['country']
-    region = form_input['region']
-    location = region if region else country
+    location = form_input['region']
+    interval = form_input['interval']
 
-    logger.info(f"Incoming request. Terms: {form_input['search_terms']} - Location: {location} - Posted since: {form_input['interval']}")
+    logger.info(f"Incoming request. Terms: {form_input['search_terms']} - County: {country['name']} - location: {location} - Posted since: {form_input['interval']}")
     honeypot = request.form.get('jamesbond')
     if honeypot:  # Bots will fill this, humans won't
         logger.warning("Bot detected!")
@@ -106,7 +107,7 @@ def search_jobs():
 
     try:
         # Use the dynamically selected job fetching function
-        all_jobs_df = asyncio.run(job_fetching_function(form_input['search_terms'], location, country, Config.DEFAULT_RADIUS, form_input['interval']))
+        all_jobs_df = asyncio.run(job_fetching_function(search_terms, country, location, interval))
 
         # Check if the DataFrame is empty (i.e., no jobs found)
         if all_jobs_df.empty:
@@ -118,7 +119,7 @@ def search_jobs():
         all_jobs_df = process_job_dataframe(all_jobs_df)
         ranked_jobs_df = rank_job_descriptions(all_jobs_df, form_input['cv_text'], form_input['preferred_keywords'], form_input['required_keywords'], form_input['exclude_keywords'])
         dump_ranked_jobs(ranked_jobs_df, Config.DUMP_FILE_NAME)
-        ranked_jobs = ranked_jobs_df[['display_title', 'job_url', 'display_company', 'date_posted', 'combined_score', 'tier', 'links']].head(Config.RESULTS_WANTED).to_dict(orient='records')
+        ranked_jobs = ranked_jobs_df[['display_title', 'display_company', 'date_posted', 'combined_score', 'tier', 'apply_options']].head(Config.RESULTS_WANTED).to_dict(orient='records')
 
         del all_jobs_df, ranked_jobs_df # Free DataFrames explicitly after use
         gc.collect() # Force garbage collection

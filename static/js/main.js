@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
-            locationInput.value = data.country;
+            locationInput.value = [data.country_name, data.country_code];
 
             // Trigger change event after setting the country value
             const event = new Event('change');
@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
             }
 
-            const linkItems = job.links.map(link => {
-                const baseDomain = new URL(link.url).hostname.replace(/^www\./, '');
+            const linkItems = job.apply_options.map(apply_option => {
+                const baseDomain = new URL(apply_option.apply_link).hostname.replace(/^www\./, '');
 
                 // Check if the favicon is already cached
                 let faviconHTML = faviconCache.get(baseDomain);
@@ -142,14 +142,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!faviconHTML) {
                     // If not cached, generate and cache the favicon HTML
                     const faviconURL = `https://icons.duckduckgo.com/ip3/${baseDomain}.ico`;
-                    faviconHTML = `<img src="${faviconURL}" alt="${link.label}" class="favicon me-1" width="16" height="16" onerror="this.style.display='none'">`;
+                    faviconHTML = `<img src="${faviconURL}" alt="${apply_option.publisher}" class="favicon me-1" width="16" height="16" onerror="this.style.display='none'">`;
                     faviconCache.set(baseDomain, faviconHTML);
                 }
 
                 return `
                     <li class="list-inline-item">
-                        <a href="${link.url}" target="_blank" class="btn btn-sm btn-outline-primary">
-                            ${faviconHTML} ${link.label}
+                        <a href="${apply_option.apply_link}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            ${faviconHTML} ${apply_option.publisher}
                         </a>
                     </li>
                 `;

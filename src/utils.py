@@ -6,7 +6,6 @@ from flask import jsonify
 from config import Config
 import pandas as pd
 import csv
-from datetime import datetime
 from werkzeug.utils import secure_filename
 import pdfplumber
 import docx
@@ -16,12 +15,19 @@ import stopwordsiso
 import logging
 from rapidfuzz import process as rf_process
 from rapidfuzz.fuzz import ratio
+from google.cloud import translate_v2 as translate
+from datetime import datetime, timedelta, timezone
 
 
 # Initialize logger
 logger = logging.getLogger(__name__)
 lang_identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 delimiters = r'[,;.]+'
+
+# Google Translate setup
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = Config.GOOGLE_APPLICATION_CREDENTIALS
+translate_client = translate.Client()
+DIGIT_PLACEHODER = r'5'
 
 def preprocess_text(text):
     """Efficient text preprocessing: convert to lowercase, replace non-alphanumeric chars, reduce spaces."""
@@ -110,7 +116,7 @@ def validate_and_clean_input(form, files):
     # Extract and preprocess text fields
     search_terms = [preprocess_text(term.strip()) for term in re.split(delimiters, form.get('search_terms', ''))]
     search_terms = [s for s in search_terms if s]
-    country = form.get('country', '').strip().split(',')[0]
+    country_name, country_code = form.get('country', '').strip().split(',')
     region = form.get('region', '').strip().split(',')[0]
     #location = f"{region}, {country}" if region else country
 
@@ -133,7 +139,7 @@ def validate_and_clean_input(form, files):
     # Validate that the essential text fields are not empty after preprocessing
     if not search_terms or all(not term for term in search_terms):
         return jsonify({'error': 'Job titles are required and cannot be empty or gibberish'}), 400
-    if not country:
+    if not country_name:
         return jsonify({'error': 'Location is required and cannot be empty or gibberish'}), 400
 
     # Validate and clean the uploaded file
@@ -173,7 +179,7 @@ def validate_and_clean_input(form, files):
     # Return cleaned data
     return {
         'search_terms': search_terms,
-        'country': country,
+        'country': {'name': country_name, 'code': country_code},
         'region': region,
         #'location': location,
         'interval': interval,
@@ -186,6 +192,98 @@ def validate_and_clean_input(form, files):
 
 def dump_ranked_jobs(ranked_jobs_df, file_path):
     ranked_jobs_df.to_csv(file_path, quoting=csv.QUOTE_NONNUMERIC, escapechar="\\", index=False)
+
+
+def translate_text(text, target_language='en'):
+    """
+    Translates text into the target language using Google Cloud Translation.
+    """
+    result = translate_client.translate(text, target_language=target_language)
+    return result['translatedText']
+
+
+def strip_digits(text):
+    """Remove digits from a string and replace with a placeholder."""
+    return re.sub(r'\d+', DIGIT_PLACEHODER, text)
+
+
+def restore_digits(template, original):
+    """Restore digits from the original string into the template."""
+    digits = re.findall(r'\d+', original)
+    return re.sub(DIGIT_PLACEHODER, lambda _: digits.pop(0), template, count=len(digits))
+
+
+def batch_translate_posted_at(strings, dest_language="en"):
+    """
+    Batch translate unique strings by collapsing them into categories to minimize API calls.
+    """
+    # Create a map of stripped strings to originals
+    stripped_map = {strip_digits(s): [] for s in strings}
+    for s in strings:
+        stripped_map[strip_digits(s)].append(s)
+
+    # Translate only the unique stripped strings
+    stripped_strings = list(stripped_map.keys())
+    translated_map = {}
+    for stripped in stripped_strings:
+        try:
+            translated_text = translate_text(stripped, target_language=dest_language)
+            translated_map[stripped] = translated_text
+        except Exception as e:
+            logger.error(f"Error translating {stripped}: {e}")
+            translated_map[stripped] = stripped  # Fallback to the original if translation fails
+
+    # Map back the translations to the originals with digits restored
+    translations = {}
+    for stripped, originals in stripped_map.items():
+        for original in originals:
+            translations[original] = restore_digits(translated_map[stripped], original)
+
+    return translations
+
+
+def devise_date_from_human_readable(jobs_df, human_readable_date_column_name, date_column_name):
+    # Batch translation of date strings
+    print(jobs_df[human_readable_date_column_name])
+    translations = batch_translate_posted_at(jobs_df[human_readable_date_column_name], dest_language="en")
+
+    # Add a column for translated date strings
+    jobs_df['translated_date'] = jobs_df[human_readable_date_column_name].map(translations)
+
+    # Date calculation
+    today = datetime.now(timezone.utc)
+
+    def calculate_date(translated_date):
+        number = 1
+        if isinstance(translated_date, str):
+            number_match = re.search(r'\d+', translated_date)
+            if number_match:
+                number = int(number_match.group())
+
+            if "day" in translated_date:
+                return today - timedelta(days=number)
+            elif "hour" in translated_date:
+                return today - timedelta(hours=number)
+            elif "month" in translated_date:
+                return today - timedelta(days=number * 30)
+            elif "minute" in translated_date:
+                return today - timedelta(minutes=number)
+        return today
+
+    # Apply the calculation to the DataFrame
+    jobs_df[date_column_name] = jobs_df['translated_date'].apply(calculate_date)
+
+    # Drop the intermediate column if not needed
+    jobs_df.drop(columns=['translated_date'], inplace=True)
+
+    return jobs_df
+
+
+def filter_jobs_by_date(jobs_df, day_interval, date_column_name):
+    today = datetime.now(timezone.utc)
+    cutoff_date = today - timedelta(days=day_interval)
+    filtered_jobs = jobs_df[pd.to_datetime(jobs_df[date_column_name], errors='coerce') >= cutoff_date]
+    return filtered_jobs.reset_index(drop=True)
 
 
 def extract_domain(url):
@@ -216,13 +314,13 @@ def clean_url(url):
 
 def process_job_dataframe(jobs_df):
     if not jobs_df.empty:
-        #Exclude low-quality job publishers. This is done despite that these may be passed to the search api as that filtering is seldom effective
-        jobs_df = jobs_df[
-            ~jobs_df['job_publisher'].fillna('').str.contains('|'.join(Config.EXCLUDED_JOB_PUBLISHERS), case=False,
-                                                              na=False)].reset_index(drop=True)
         # Format date and preprocess columns
-        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce').fillna(
-            datetime.today()).dt.strftime('%b %d')
+        #jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce').fillna(pd.Timestamp(datetime.now())).dt.strftime('%b %d')
+        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce')
+        jobs_df.loc[jobs_df['date_posted'].isna(), 'date_posted'] = pd.Timestamp.today(tz='UTC')
+        jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce')
+        print(jobs_df['date_posted'])
+        jobs_df['date_posted'] = jobs_df['date_posted'].dt.strftime('%b %d')
         jobs_df['display_title'] = jobs_df['title'].fillna('').replace('', 'Unknown').str.strip()
         jobs_df['display_company'] = jobs_df['company'].fillna('').replace('', 'Unknown').str.strip().str.title()
         jobs_df['title'] = jobs_df['display_title'].apply(preprocess_text)
@@ -247,7 +345,7 @@ def process_job_dataframe(jobs_df):
                 row['merge_key'],
                 jobs_df['merge_key'].tolist(),
                 scorer=ratio,
-                score_cutoff=85
+                score_cutoff=80
             )
 
             # Collect indices of matching rows
@@ -275,12 +373,12 @@ def process_job_dataframe(jobs_df):
                 if isinstance(options, list):
                     combined_apply_options.extend(options)
 
-            # Remove duplicate apply options by apply_link
-            combined_apply_options = list({option['apply_link']: option for option in combined_apply_options}.values())
+            # Remove duplicate options by apply_link
+            combined_apply_links = list({clean_url(option['apply_link']) for option in combined_apply_options})
 
             # Consolidate row (keep the first row as base)
             base_row = jobs_df.loc[group_idx].copy()
-            base_row['apply_options'] = combined_apply_options
+            base_row['apply_links'] = combined_apply_links
             consolidated_rows.append(base_row)
 
         # Create new DataFrame from consolidated rows
@@ -290,13 +388,17 @@ def process_job_dataframe(jobs_df):
         jobs_df = jobs_df.drop(columns=['first_word_company', 'merge_key'], errors='ignore')
 
         # Generate the links column
-        jobs_df['links'] = jobs_df['apply_options'].apply(lambda options: [
+        jobs_df['apply_options'] = jobs_df['apply_links'].apply(lambda links: [
             {
-                'label': extract_domain(option['apply_link']),
-                'url': clean_url(option['apply_link'])
+                'publisher': extract_domain(link),
+                'apply_link': link
             }
-            for option in options
-        ] if isinstance(options, list) else [])
+            for link in links if
+            not any(excluded in link.lower() for excluded in [s.lower() for s in Config.EXCLUDED_JOB_PUBLISHERS]) # exclude crappy job links
+        ] if isinstance(links, list) else [])
+
+        # Drop rows where `apply_options` is an empty list
+        jobs_df = jobs_df[jobs_df['apply_options'].apply(len) > 0].reset_index(drop=True)
 
         # Drop intermediate columns
         jobs_df = jobs_df.drop(columns=['first_word_company', 'merge_key'], errors='ignore')

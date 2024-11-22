@@ -6,6 +6,8 @@ import asyncio
 import aiohttp
 from config import Config
 import random
+from ..utils import devise_date_from_human_readable, filter_jobs_by_date
+
 
 # Constants for JSearch
 API_URL = Config.JSEARCH_API_URL
@@ -75,17 +77,16 @@ async def enforce_rate_limit():
 
 
 # Fetch jobs for a single search term, with retry, backoff, and rate limit enforcement combined
-async def fetch_jobs_for_search_term(session, search_term, location, country, radius, interval, retries=3, backoff_factor=0.5):
+async def fetch_jobs_for_search_term(session, search_term, country, location, interval, retries=3, backoff_factor=0.5):
     """
     Fetch jobs for a single search term from JSearch API, with retry and rate limiting.
     """
     querystring = {
-        "query": f"{search_term} in {location}",
-        "country": country,
+        "query": f"{search_term} in {location}" if location else search_term,
+        "country": country['code'],
         "date_posted": interval,
         "num_pages" : Config.NUM_SEARCH_PAGES,
-        "exclude_job_publishers": " ".join(Config.EXCLUDED_JOB_PUBLISHERS),
-        "radius": radius
+        #"exclude_job_publishers": " ".join(Config.EXCLUDED_JOB_PUBLISHERS),
     }
     print(querystring)
 
@@ -113,7 +114,7 @@ async def fetch_jobs_for_search_term(session, search_term, location, country, ra
 
 
 # Fetch jobs concurrently for multiple search terms
-async def fetch_jobs(search_terms, location, country, radius, interval):
+async def fetch_jobs(search_terms, country, location, interval):
     """
     Fetch jobs concurrently for multiple search terms, handling retries, rate limits, and errors.
     """
@@ -121,7 +122,7 @@ async def fetch_jobs(search_terms, location, country, radius, interval):
         raise ValueError("JSearch API key is missing. Please set JSEARCH_API_KEY in the environment.")
 
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_jobs_for_search_term(session, term, location, country, radius, interval) for term in search_terms]
+        tasks = [fetch_jobs_for_search_term(session, term, country, location, interval) for term in search_terms]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Process results
@@ -137,5 +138,12 @@ async def fetch_jobs(search_terms, location, country, radius, interval):
                 all_jobs_df = pd.concat([all_jobs_df, jobs_df], ignore_index=True)
             else:
                 logger.warning(f"Unexpected result type: {type(data)}, skipping this result.")
+
+        # additional logic to filter jsearch results due to api malfunction
+        if not all_jobs_df.empty:
+            all_jobs_df['job_posted_human_readable'] = all_jobs_df['job_posted_human_readable'].replace(['', None], 'today').fillna('today')
+            day_interval = Config.INTERVAL_MAPPING.get(interval, 30)
+            all_jobs_df = devise_date_from_human_readable(all_jobs_df, 'job_posted_human_readable', 'date_posted')
+            all_jobs_df = filter_jobs_by_date(all_jobs_df, day_interval, 'date_posted')
 
         return all_jobs_df

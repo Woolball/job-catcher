@@ -24,11 +24,17 @@ class Config:
     }
     CV_TEXT_LIMIT = 2000 #limit cv text to first 2000 words
     RESULTS_WANTED = 50
-    NUM_SEARCH_PAGES = 2
+    NUM_SEARCH_PAGES = 10
     DUMP_FILE_NAME = 'data/dump_search.csv'
-    DEFAULT_RADIUS = 50
+    #DEFAULT_RADIUS = 50
     INTERVAL_MAPPING = {'month': 30, 'week': 7, '3days': 3, 'today': 1}
-    EXCLUDED_JOB_PUBLISHERS = ['Trabajo', 'BeBee', 'Learn4Good', 'Joinrs']
+    EXCLUDED_JOB_PUBLISHERS = ['Trabajo', 'BeBee', 'Learn4Good', 'Joinrs', 'Emprego', 'Jobilize', 'Turtle5',
+                               'Karkidi', 'Jooble', 'Jobgether', 'Grabjobs', 'Job7', 'Expertini', 'Clickajobs',
+                               'Jobijoba', 'Sercanto', 'Pangian', 'Workpool', '123suisse', 'Praktikumsstelle',
+                               'Meritocracy', 'Jobswitzerlands', 'Theladders', 'Teamblind', 'Mysmartpros', 'Yulys',
+                               'Peacefulponderosacabin', 'Mediabistro', 'Otta', 'Welcometothejungle','Searchremotely',
+                               '176.232', 'allboardsolutions', 'grstudy1', 'infinityfreeapp', '919usa', 'techfetch',
+                               'allexamsolution', 'joinrise', 'jobbio', 'lazyapply', 'theorg']
     #EXCLUDED_JOB_PUBLISHERS = []
 
     FETCHER_NAME = os.getenv('FETCHER', 'scraper').lower()
@@ -42,6 +48,11 @@ class Config:
 
     REDIS_HOST = os.getenv("REDIS_HOST", "")
     REDIS_PORT = os.getenv("REDIS_PORT", 6379)
+
+    SERP_API_URL = os.getenv("SERP_API_URL", "https://serpapi.com/search.json")  # Default URL
+    SERP_API_KEY = os.getenv("SERP_API_KEY", "")  # Default to empty string if not provided
+
+    GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
     LANG_COVERAGE_SBERT = ('ar, bg, ca, cs, da, de, el, en, es, et, fa, fi, fr, fr, gl, gu, he, hi, hr, hu, hy, id,'
                            ' it, ja, ka, ko, ku, lt, lv, mk, mn, mr, ms, my, nb, nl, pl, pt, ro, ru, sk, sl, sq,'
