@@ -88,7 +88,6 @@ async def fetch_jobs_for_search_term(session, search_term, country, location, in
         "num_pages" : Config.NUM_SEARCH_PAGES,
         #"exclude_job_publishers": " ".join(Config.EXCLUDED_JOB_PUBLISHERS),
     }
-    print(querystring)
 
     for attempt in range(retries):
         await enforce_rate_limit()  # Ensure rate limit is respected before every attempt

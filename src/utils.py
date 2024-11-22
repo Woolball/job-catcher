@@ -244,7 +244,6 @@ def batch_translate_posted_at(strings, dest_language="en"):
 
 def devise_date_from_human_readable(jobs_df, human_readable_date_column_name, date_column_name):
     # Batch translation of date strings
-    print(jobs_df[human_readable_date_column_name])
     translations = batch_translate_posted_at(jobs_df[human_readable_date_column_name], dest_language="en")
 
     # Add a column for translated date strings
@@ -319,7 +318,6 @@ def process_job_dataframe(jobs_df):
         jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce')
         jobs_df.loc[jobs_df['date_posted'].isna(), 'date_posted'] = pd.Timestamp.today(tz='UTC')
         jobs_df['date_posted'] = pd.to_datetime(jobs_df['date_posted'], errors='coerce')
-        print(jobs_df['date_posted'])
         jobs_df['date_posted'] = jobs_df['date_posted'].dt.strftime('%b %d')
         jobs_df['display_title'] = jobs_df['title'].fillna('').replace('', 'Unknown').str.strip()
         jobs_df['display_company'] = jobs_df['company'].fillna('').replace('', 'Unknown').str.strip().str.title()

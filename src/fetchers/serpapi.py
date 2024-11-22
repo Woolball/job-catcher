@@ -104,7 +104,6 @@ async def fetch_jobs(search_terms, country, location, interval):
         if not all_jobs:
             return pd.DataFrame()
         all_jobs_df = pd.DataFrame(all_jobs)
-        print(all_jobs_df['detected_extensions'])
 
         # Extract and handle 'posted_at'
         all_jobs_df['posted_at'] = all_jobs_df.apply(
@@ -130,4 +129,3 @@ if __name__ == "__main__":
     interval = 'month'
 
     all_jobs_df = asyncio.run(fetch_jobs(search_terms, country, location, interval))
-    print(all_jobs_df['apply_options'])
